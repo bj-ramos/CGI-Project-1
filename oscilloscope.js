@@ -4,7 +4,7 @@ window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
 
     //background canvas grid colouring
-    ctx.fillRect(0, 0, 100, 75)
+    //ctx.fillRect(0, 0, 100, 75)
     
     //webgl setup and warning 
     gl = WebGLUtils.setupWebGL(canvas);
@@ -12,11 +12,14 @@ window.onload = function init() {
         alert("WebGL isn't available");
     }
 
+
+
     // Three vertices 
     var vertices = [
-        vec2(-0.5, -0.5),
-        vec2(0.5, -0.5),
-        vec2(0, 0.5)
+        vec2(-3, 0),
+        vec2(-3, 3),
+        vec2(0, -3),
+        vec2(3,1)
     ];
 
     // Configure WebGL
@@ -26,6 +29,7 @@ window.onload = function init() {
     // Load shaders and initialize attribute buffers
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
+    
 
     // Load the data into the GPU
     var bufferId = gl.createBuffer();
@@ -42,4 +46,6 @@ window.onload = function init() {
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    //new frag
+    gl.drawArrays(gl.TRIANGLES, 1, 4);
 }
