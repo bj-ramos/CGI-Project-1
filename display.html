@@ -11,7 +11,7 @@ void main(){
   <script id="fragment-shader" type="x-shader/x-fragment">
     precision mediump float;
 void main() {
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }
 </script>
 <script type="text/javascript" src="Common\initShaders.js"></script>
@@ -22,7 +22,7 @@ void main() {
 
 <body>
   <title>Oscilloscope</title>
-  <canvas id="gl-canvas" width="512" height="512">
+  <canvas id="gl-canvas" width="1900" height="650" style="background-color: rgb(0, 0, 0);">
     Oops... your browser doesn't support the HTML5 canvas element"
   </canvas>
 </body>

@@ -2,6 +2,11 @@ var gl;
 
 window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
+
+    //background canvas grid colouring
+    ctx.fillRect(0, 0, 100, 75)
+    
+    //webgl setup and warning 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
         alert("WebGL isn't available");
