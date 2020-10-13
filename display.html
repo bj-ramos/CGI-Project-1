@@ -1,43 +1,30 @@
-<!-- display file to render the oscilloscope -->
 <!DOCTYPE html>
 <html>
+
 <head>
-    <script src="osciloscope.js"></script>
-<style>
-.grid-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  background-color: #2196F3;
-  padding: 10px;
+  <script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 vPosition;
+void main(){
+    gl_Position = vPosition;
 }
-.grid-item {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  font-size: 30px;
-  text-align: center;
+</script>
+  <script id="fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+void main() {
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
-</style>
+</script>
+<script type="text/javascript" src="Common\initShaders.js"></script>
+<script type="text/javascript" src="Common\webgl-utils.js"></script>
+<script type="text/javascript" src="Common\MV.js"></script>
+<script type="text/javascript" src="oscilloscope.js"></script>
 </head>
+
 <body>
-
-<h1>Grid Elements</h1>
-
-<p>A Grid Layout must have a parent element with the <em>display</em> property set to <em>grid</em> or <em>inline-grid</em>.</p>
-
-<p>Direct child element(s) of the grid container automatically becomes grid items.</p>
-
-<div class="grid-container">
-  <div class="grid-item">1</div>
-  <div class="grid-item">2</div>
-  <div class="grid-item">3</div>
-  <div class="grid-item">4</div>
-  <div class="grid-item">5</div>
-  <div class="grid-item">6</div>
-  <div class="grid-item">7</div>
-  <div class="grid-item">8</div>
-  <div class="grid-item">9</div>
-</div>
-
+  <title>Oscilloscope</title>
+  <canvas id="gl-canvas" width="512" height="512">
+    Oops... your browser doesn't support the HTML5 canvas element"
+  </canvas>
 </body>
+
 </html>
