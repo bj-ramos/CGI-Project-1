@@ -25,7 +25,7 @@ window.onload = function init() {
         vec2(-1, 1),
         vec2(1, -1),
 
-        //display line
+        //display screen horizontal lines
         vec2(-1,0.75),
         vec2(1,0.75),
         vec2(-1,0.5),
@@ -41,21 +41,29 @@ window.onload = function init() {
         vec2(1,-0.75),
         vec2(-1,-0.75),
 
-        //
-        vec2(-0.75,1),
-        vec2(-0.75,-1),
-        vec2(-0.5,1),
-        vec2(-0.5,-1),
-        vec2(-0.25,1),
-        vec2(-0.25,-1),
+        //display screen vertical lines
+        vec2(-1+(1/6),1),
+        vec2(-1+(1/6),-1),
+        vec2(-1+(1/3),1),
+        vec2(-1+(1/3),-1),
+        vec2(-1+(1/2),1),
+        vec2(-1+(1/2),-1),
+        vec2(-1+(2/3),-1),
+        vec2(-1+(2/3),1),
+        vec2(-1+(5/6),-1),
+        vec2(-1+(5/6),1),
         vec2(0,-1),
         vec2(0,1),
-        vec2(0.25,-1),
-        vec2(0.25,1),
-        vec2(0.5,-1),
-        vec2(0.5,1),
-        vec2(0.75,1),
-        vec2(0.75,-1)
+        vec2(1-1/6,1),
+        vec2(1-1/6,-1),
+        vec2(1-1/3,1),
+        vec2(1-1/3,-1),
+        vec2(1-1/2,1),
+        vec2(1-1/2,-1),
+        vec2(1-2/3,-1),
+        vec2(1-2/3,1),
+        vec2(1-5/6,-1),
+        vec2(1-5/6,1)
     
 
 
@@ -113,11 +121,11 @@ function renderRed() {
 function renderGreen() {
 
     for (i = 6; i < 20; i=i+2) {
-        gl.drawArrays(gl.LINE_STRIP, i, 2);
+        gl.drawArrays(gl.LINES, i, 2);
     }
 
-    for (i = 20; i < 34; i=i+2) {
-        gl.drawArrays(gl.LINE_STRIP, i, 2);
+    for (i = 20; i < 42; i=i+2) {
+        gl.drawArrays(gl.LINES, i, 2);
     }
 
 }
