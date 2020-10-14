@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "CGI Project 1",
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "CGI Project 1"
+	}
+}

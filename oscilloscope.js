@@ -5,7 +5,7 @@ window.onload = function init() {
 
     //background canvas grid colouring
     //ctx.fillRect(0, 0, 100, 75)
-    
+
     //webgl setup and warning 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -16,10 +16,26 @@ window.onload = function init() {
 
     // Three vertices 
     var vertices = [
-        vec2(-3, 0),
-        vec2(-3, 3),
-        vec2(0, -3),
-        vec2(3,1)
+        //display screen background triangle1
+        vec2(-1, 1),
+        vec2(-1, -1),
+        vec2(1, -1),
+        //display screen background triangle2
+        vec2(1, 1),
+        vec2(-1, 1),
+        vec2(1, -1),
+
+        //display line
+        vec2(1, 1),
+        vec2(-1, -1),
+
+        vec2(-1, 0.75),
+        vec2(1, 0.75), 
+
+
+
+
+
     ];
 
     // Configure WebGL
@@ -27,9 +43,10 @@ window.onload = function init() {
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
     // Load shaders and initialize attribute buffers
-    var program = initShaders(gl, "vertex-shader", "fragment-shader");
+    var program = initShaders(gl, "vertex-shader", "fragment-shader-1");
     gl.useProgram(program);
-    
+
+
 
     // Load the data into the GPU
     var bufferId = gl.createBuffer();
@@ -40,12 +57,34 @@ window.onload = function init() {
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
-    render();
+
+
+    renderRed();
+
+
+    // Load shaders and initialize attribute buffers
+    var program = initShaders(gl, "vertex-shader", "fragment-shader-2");
+    gl.useProgram(program);
+
+    renderGreen();
+
+
+
 }
 
-function render() {
+function renderRed() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    //new frag
-    gl.drawArrays(gl.TRIANGLES, 1, 4);
+    gl.drawArrays(gl.TRIANGLES, 3, 3);
+
+
+}
+
+function renderGreen() {
+
+    for (i = 0; i < 8; i++) {
+        gl.drawArrays(gl.LINE_STRIP, 8, 2);
+    }
+
+
 }
