@@ -6,6 +6,8 @@ let program;
 // Create vao
 let vao;
 
+// Flag for drawing points or lines
+let drawPoints = false;
 
 
 function resize(target) {
@@ -91,6 +93,7 @@ function setup(shaders) {
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
+                drawPoints = !drawPoints;
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
@@ -136,7 +139,13 @@ function animate(timestamp) {
     gl.bindVertexArray(vao);
 
     // Drawing code
-    gl.drawArrays(gl.POINTS, 0, 60000);
+    if(drawPoints){
+        gl.drawArrays(gl.POINTS, 0, 60000);
+    }
+    else{
+        gl.drawArrays(gl.LINE_LOOP, 0, 60000);
+    }
+    
     gl.bindVertexArray(null);
 }
 
