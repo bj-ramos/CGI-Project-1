@@ -4,7 +4,7 @@ let canvas;
 let gl;
 let program;
 // Create vao
-var vao;
+let vao;
 
 
 
@@ -39,6 +39,8 @@ function setup(shaders) {
     for (let i = 0; i < 60000; i++){
         a_index_array[i] = i;
     }
+
+    console.log (a_index_array);
 
     // Create attribute buffer, bind it and read array data into it
     const aBuffer = gl.createBuffer();
