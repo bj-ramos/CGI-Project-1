@@ -9,6 +9,12 @@ let vao;
 // Flag for drawing points or lines
 let drawPoints = false;
 
+// Uniforms
+let u_curveFamily, u_a, u_b, u_c;
+
+// Values for uniforms 
+let curveFamilyValue = 0;
+let aValue, bValue, cValue;
 
 function resize(target) {
     // Aquire the new window dimensions
@@ -36,8 +42,6 @@ function setup(shaders) {
     // Create WebGL programs
     program = buildProgramFromSources(gl, shaders["shader1.vert"], shaders["shader1.frag"]);
 
-
-
     resize(window);
 
     // Populate an array with unsigned int values from 0 to 60000 
@@ -62,6 +66,12 @@ function setup(shaders) {
     gl.vertexAttribIPointer(a_position, 1, gl.UNSIGNED_INT, false, 0, 0);
     gl.enableVertexAttribArray(a_position);
 
+    // Setup location for uniforms
+    u_curveFamily = gl.getUniformLocation(program, "u_curveFamily");
+    u_a = gl.getUniformLocation(program, "u_a");
+    u_b = gl.getUniformLocation(program, "u_b");
+    u_c = gl.getUniformLocation(program, "u_c");
+
     // Handle resize events 
     window.addEventListener("resize", (event) => {
         resize(event.target);
@@ -70,26 +80,37 @@ function setup(shaders) {
     // Handle keyboard events
     window.addEventListener("keydown", function (event){
         switch(event.key){
+            case "0":
+                console.log("Debug Family 0")
+                curveFamilyValue = 0;
+                break;
             case "1":
-                console.log("1");
+                console.log("Draw Family 1");
+                curveFamilyValue = 1;
                 break;
             case "2":
-                console.log("2");
+                console.log("Draw Family 2");
+                curveFamilyValue= 2;
                 break;
             case "3":
-                console.log("3");
+                console.log("Draw Family 3");
+                curveFamilyValue = 3;
                 break;
             case "4":
-                console.log("4");
+                console.log("Draw Family 4");
+                curveFamilyValue = 4;
                 break;
             case "5":
-                console.log("5");
+                console.log("Draw Family 5");
+                curveFamilyValue = 5;
                 break;
             case "6":
-                console.log("6");
+                console.log("Draw Family 6");
+                curveFamilyValue = 6;
                 break;
             case "r":
-                console.log("Restart");
+                console.log("Restart Program");
+                curveFamilyValue = 0;
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
@@ -135,6 +156,19 @@ function animate(timestamp) {
 
     gl.useProgram(program);
 
+    // Update uniform values
+    gl.uniform1i(u_curveFamily, curveFamilyValue);
+
+    // hard coded for testing
+    aValue = 5.4;
+    bValue = 2.8;
+    cValue = 1.2;
+
+    gl.uniform1f(u_a, aValue);
+    gl.uniform1f(u_b, bValue);
+    gl.uniform1f(u_c, cValue);
+
+
     // Bind vao
     gl.bindVertexArray(vao);
 
@@ -143,7 +177,7 @@ function animate(timestamp) {
         gl.drawArrays(gl.POINTS, 0, 60000);
     }
     else{
-        gl.drawArrays(gl.LINE_LOOP, 0, 60000);
+        gl.drawArrays(gl.LINE_STRIP, 0, 60000);
     }
     
     gl.bindVertexArray(null);
