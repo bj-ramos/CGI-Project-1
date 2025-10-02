@@ -17,9 +17,13 @@ function resize(target) {
     canvas.width = width;
     canvas.height = height;
 
-
     // Set the WebGL viewport to fill the canvas completely
     gl.viewport(0, 0, width, height);
+
+    // Set and update Aspect ration on resize event
+    const u_aspect = gl.getUniformLocation(program, "u_aspect");
+    gl.useProgram(program);
+    gl.uniform1f(u_aspect, canvas.width / canvas.height);
 }
 
 
@@ -35,31 +39,82 @@ function setup(shaders) {
     resize(window);
 
     // Populate an array with unsigned int values from 0 to 60000 
-    let a_index_array = new Uint32Array(60000);
+    let a_position_array = new Uint32Array(60000);
     for (let i = 0; i < 60000; i++){
-        a_index_array[i] = i;
+        a_position_array[i] = i;
     }
 
-    console.log (a_index_array);
+    console.log(a_position_array);
 
     // Create attribute buffer, bind it and read array data into it
     const aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, a_index_array, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
 
     // Create and bind VAO
     vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
 
     // Refer to a_position in variable in vertex shader and inject 
-    const a_index_position = gl.getAttribLocation(program, "a_position");
-    gl.vertexAttribIPointer(a_index_position, 1, gl.UNSIGNED_INT, false, 0, 0);
-    gl.enableVertexAttribArray(a_index_position);
+    const a_position = gl.getAttribLocation(program, "a_position");
+    gl.vertexAttribIPointer(a_position, 1, gl.UNSIGNED_INT, false, 0, 0);
+    gl.enableVertexAttribArray(a_position);
 
     // Handle resize events 
     window.addEventListener("resize", (event) => {
         resize(event.target);
     });
+
+    // Handle keyboard events
+    window.addEventListener("keydown", function (event){
+        switch(event.key){
+            case "1":
+                console.log("1");
+                break;
+            case "2":
+                console.log("2");
+                break;
+            case "3":
+                console.log("3");
+                break;
+            case "4":
+                console.log("4");
+                break;
+            case "5":
+                console.log("5");
+                break;
+            case "6":
+                console.log("6");
+                break;
+            case "r":
+                console.log("Restart");
+                break;
+            case " ":
+                console.log("Toggle Auto Animation");
+                break;
+            case "ArrowLeft":
+                console.log("ArrowLeft");
+                break;
+            case "ArrowRight":
+                console.log("ArrowRight");
+                break;
+            case "ArrowUp":
+                console.log("ArrowUp");
+                break;
+            case "ArrowDown":
+                console.log("ArrowDown");
+                break;
+            case "PageUp":
+                console.log("PageUp");
+                break;
+            case "PageDown":
+                console.log("PageDown");
+                break;
+            
+        }
+    });
+
+    // Handle mouse events
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -78,7 +133,7 @@ function animate(timestamp) {
     gl.bindVertexArray(vao);
 
     // Drawing code
-    gl.drawArrays(gl.LINE_LOOP, 0, 60000);
+    gl.drawArrays(gl.POINTS, 0, 60000);
     gl.bindVertexArray(null);
 }
 
