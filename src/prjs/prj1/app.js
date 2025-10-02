@@ -3,6 +3,8 @@ import { loadShadersFromURLS, buildProgramFromSources, setupWebGL } from "../../
 let canvas;
 let gl;
 let program;
+// Create vao
+var vao;
 
 
 
@@ -32,6 +34,26 @@ function setup(shaders) {
 
     resize(window);
 
+    // Populate an array with unsigned int values from 0 to 60000 
+    let a_index_array = new Uint32Array(60000);
+    for (let i = 0; i < 60000; i++){
+        a_index_array[i] = i;
+    }
+
+    // Create attribute buffer, bind it and read array data into it
+    const aBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, a_index_array, gl.STATIC_DRAW);
+
+    // Create and bind VAO
+    vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    // Refer to a_position in variable in vertex shader and inject 
+    const a_index_position = gl.getAttribLocation(program, "a_position");
+    gl.vertexAttribIPointer(a_index_position, 1, gl.UNSIGNED_INT, false, 0, 0);
+    gl.enableVertexAttribArray(a_index_position);
+
     // Handle resize events 
     window.addEventListener("resize", (event) => {
         resize(event.target);
@@ -50,8 +72,13 @@ function animate(timestamp) {
 
     gl.useProgram(program);
 
-    // Some drawing code...
-    gl.useProgram(null);
+    // Bind vao
+    gl.bindVertexArray(vao);
+
+    // Drawing code
+    gl.drawArrays(gl.LINE_LOOP, 0, 60000);
+    gl.bindVertexArray(null);
 }
+
 
 loadShadersFromURLS(["shader1.vert", "shader1.frag"]).then(shaders => setup(shaders));
