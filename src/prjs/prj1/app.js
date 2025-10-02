@@ -89,6 +89,9 @@ function setup(shaders) {
             case "r":
                 console.log("Restart");
                 break;
+            case "p":
+                console.log("Toggle Draw Mode");
+                break;
             case " ":
                 console.log("Toggle Auto Animation");
                 break;
