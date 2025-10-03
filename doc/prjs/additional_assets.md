@@ -8,4 +8,6 @@
 
 ![IMAGE ALT TEXT'](./assets/board_2.jpeg)
 
+- IMAGE 3
 
+![IMAGE ALT TEXT'](./assets/board_3.jpeg)
