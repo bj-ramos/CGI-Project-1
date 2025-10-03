@@ -46,6 +46,10 @@
 
         The canvas should resize automatically to fill the entire browser window.
 
+- (9) User Interface:
+
+        Display information through bubbles in the browser(real time updates of values).
+
 # Specifications
 
 - (a) Vertex Shader for Points:
