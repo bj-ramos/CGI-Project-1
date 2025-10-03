@@ -6,6 +6,9 @@ let program;
 // Create vao
 let vao;
 
+// Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
+let samplePointsN = 60000;
+
 // Flag for drawing points or lines
 let drawPoints = false;
 
@@ -15,6 +18,24 @@ let u_curveFamily, u_a, u_b, u_c;
 // Values for uniforms 
 let curveFamilyValue = 0;
 let aValue, bValue, cValue;
+
+
+// Call same functions as in SETUP but on keystroke update in order to refresh the aBuffer contents
+function updateSamplePoints(step){
+    // Clamp the value between 0 and 60000
+    samplePointsN = Math.max(0, Math.min(60000, samplePointsN + step));
+
+    let a_position_array = new Uint32Array(samplePointsN);
+    for (let i = 0; i < samplePointsN; i++){
+        a_position_array[i] = i;
+    }
+
+    console.log(a_position_array);
+
+    const aBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
+}
 
 function resize(target) {
     // Aquire the new window dimensions
@@ -44,9 +65,9 @@ function setup(shaders) {
 
     resize(window);
 
-    // Populate an array with unsigned int values from 0 to 60000 
-    let a_position_array = new Uint32Array(60000);
-    for (let i = 0; i < 60000; i++){
+    // Populate an array with unsigned int values ranging from 0 to number of sample points
+    let a_position_array = new Uint32Array(samplePointsN);
+    for (let i = 0; i < samplePointsN; i++){
         a_position_array[i] = i;
     }
 
@@ -110,7 +131,8 @@ function setup(shaders) {
                 break;
             case "r":
                 console.log("Restart Program");
-                curveFamilyValue = 0;
+                //more default values
+                samplePointsN = 60000;
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
@@ -136,6 +158,14 @@ function setup(shaders) {
                 break;
             case "PageDown":
                 console.log("PageDown");
+                break;
+            case "+":
+                console.log("Step sample up by 500 points");
+                updateSamplePoints(500);
+                break;
+            case "-":
+                console.log("Step sample down by 500 points");
+                updateSamplePoints(-500);
                 break;
             
         }
@@ -174,10 +204,10 @@ function animate(timestamp) {
 
     // Drawing code
     if(drawPoints){
-        gl.drawArrays(gl.POINTS, 0, 60000);
+        gl.drawArrays(gl.POINTS, 0, samplePointsN);
     }
     else{
-        gl.drawArrays(gl.LINE_STRIP, 0, 60000);
+        gl.drawArrays(gl.LINE_STRIP, 0, samplePointsN);
     }
     
     gl.bindVertexArray(null);
