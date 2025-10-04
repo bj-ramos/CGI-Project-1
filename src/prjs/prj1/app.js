@@ -15,17 +15,17 @@ let u_curveFamily, u_a, u_b, u_c;
 // Values for uniforms 
 let curveFamilyValue = 0;
 let aValue = 1.0;
-let bValue = 0.0;
-let cValue = 1.0;
+let bValue = 1.0;
+let cValue = 0.0;
 
 
 //Parameter range for t
 let tMin = 0.0;
 let tMax = 6.283185;
 
-const MIN_NUM_POINTS = 0
-const MAX_NUM_POINTS = 60000
-let current_num_Points = 60000
+const MIN_NUM_POINTS = 0;
+const MAX_NUM_POINTS = 60000;
+let current_num_Points = 60000;
 
 /// Function to update the Info panel
 function updateInfoPanel() {
@@ -152,11 +152,10 @@ function setup(shaders) {
                 updateInfoPanel();
                 break;
             case "r":
-                console.log("Restart Program");
-                curveFamilyValue = 0;
+                console.log("Restart Coefficients");
                 aValue = 1.0;
-                bValue = 0.0;
-                cValue = 1.0;
+                bValue = 1.0;
+                cValue = 0.0;
                 tMin = 0.0;
                 tMax = 6.283185;
                 updateInfoPanel();
@@ -171,32 +170,40 @@ function setup(shaders) {
                 break;
             case "ArrowLeft":
                 console.log("ArrowLeft");
-                aValue -= 0.1;
+                // I think this and ArrowRight should select which coef is going to be changed by the user
+                // Using some kind of array or carousel type thing, maybe a simple boolean or flag system
+                // select_next_coefficient()
                 updateInfoPanel();
                 break;
             case "ArrowRight":
                 console.log("ArrowRight");
-                aValue += 0.1;
+                // I think this and ArrowLeft should select which coef is going to be changed by the user
+                // Using some kind of array or carousel type thing, maybe a simple boolean or flag system
+                // select_previous_coefficient()
                 updateInfoPanel();
                 break;
             case "ArrowUp":
                 console.log("ArrowUp");
-                bValue += 0.1;
+                // This and ArrowDown will then increase and decrease, respectively, the currently selected coeficcient
+                // increase_selected_coefficient()
                 updateInfoPanel();
                 break;
             case "ArrowDown":
                 console.log("ArrowDown");
-                bValue -= 0.1;
+                // This and ArrowUp will then increase and decrease, respectively, the currently selected coeficcient
+                // decrease_selected_coefficient()
                 updateInfoPanel();
                 break;
             case "PageUp":
                 console.log("PageUp");
-                cValue += 0.1;
+                // PageUp and PageDown will increase and decrease, respectively, the limit (t)
+                // increase_t()
                 updateInfoPanel();
                 break;
             case "PageDown":
                 console.log("PageDown");
-                cValue -= 0.1;
+                // PageUp and PageDown will increase and decrease, respectively, the limit (t)
+                // decrease_t()
                 updateInfoPanel();
                 break;
             case "+":
@@ -215,9 +222,6 @@ function setup(shaders) {
                 }
                 setup()
                 break;
-
-
-
         }
     });
 
