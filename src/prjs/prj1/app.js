@@ -13,18 +13,29 @@ let samplePointsN = 60000;
 let drawPoints = false;
 
 // Uniforms
-let u_curveFamily, u_a, u_b, u_c;
+let u_curveFamily, u_samplePoints, u_a, u_b, u_c;
 
 // Values for uniforms 
 let curveFamilyValue = 0;
 let aValue, bValue, cValue;
 
 
+// Variable buffer to be accessed in any call 
+let aBuffer;
+
 // Call same functions as in SETUP but on keystroke update in order to refresh the aBuffer contents
 function updateSamplePoints(step){
-    // Clamp the value between 0 and 60000
-    samplePointsN = Math.max(0, Math.min(60000, samplePointsN + step));
 
+    if (step == 0){
+        // Reset Sample points to default
+        samplePointsN = 60000;
+    }
+    else{
+        // Clamp the value between 0 and 60000
+        samplePointsN = Math.max(0, Math.min(60000, samplePointsN + step));
+    }
+
+    // Update Buffer with new sample size
     let a_position_array = new Uint32Array(samplePointsN);
     for (let i = 0; i < samplePointsN; i++){
         a_position_array[i] = i;
@@ -32,9 +43,18 @@ function updateSamplePoints(step){
 
     console.log(a_position_array);
 
-    const aBuffer = gl.createBuffer();
+    aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
+
+    // Rebind VAO with new information and attribute pointer
+    gl.bindVertexArray(vao);
+    const a_position = gl.getAttribLocation(program, "a_position");
+    gl.vertexAttribIPointer(a_position, 1, gl.UNSIGNED_INT, false, 0, 0);
+    gl.enableVertexAttribArray(a_position);
+    gl.bindVertexArray(null);
+
+   
 }
 
 function resize(target) {
@@ -71,10 +91,10 @@ function setup(shaders) {
         a_position_array[i] = i;
     }
 
-    console.log(a_position_array);
+    console.log("Updated sample points:", samplePointsN);
 
     // Create attribute buffer, bind it and read array data into it
-    const aBuffer = gl.createBuffer();
+    aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
 
@@ -89,6 +109,7 @@ function setup(shaders) {
 
     // Setup location for uniforms
     u_curveFamily = gl.getUniformLocation(program, "u_curveFamily");
+    u_samplePoints = gl.getUniformLocation(program, "u_samplePoints");
     u_a = gl.getUniformLocation(program, "u_a");
     u_b = gl.getUniformLocation(program, "u_b");
     u_c = gl.getUniformLocation(program, "u_c");
@@ -132,7 +153,7 @@ function setup(shaders) {
             case "r":
                 console.log("Restart Program");
                 //more default values
-                samplePointsN = 60000;
+                updateSamplePoints(0);
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
@@ -188,6 +209,7 @@ function animate(timestamp) {
 
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
+    gl.uniform1f(u_samplePoints, samplePointsN);
 
     // hard coded for testing
     aValue = 5.4;
