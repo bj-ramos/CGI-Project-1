@@ -12,6 +12,9 @@ let vao;
 // Flag for drawing points or lines
 let drawPoints = false;
 
+// Flag for mouse click and drag
+let isClicked = false;
+
 // Uniforms
 let u_curveFamily, u_samplePoints, u_panx, u_pany, u_zoom, u_a, u_b, u_c;
 
@@ -25,6 +28,10 @@ let aValue, bValue, cValue;
 let panxValue = 0.0;
 let panyValue = 0.0;
 let zoomValue = 1.0;
+
+// Values for mouse panning
+let mouse_startX, mouse_startY;
+
 
 
 // Call same functions as in SETUP but on keystroke update in order to refresh the aBuffer contents
@@ -207,16 +214,29 @@ function setup(shaders) {
     // Handle mouse and wheel movement events
     canvas.addEventListener("mousedown", function (event) {
         console.log("Mouse down", event);
-        let mouse_startX = event.clientX;
-        let mouse_startY = event.clientY;
+        isClicked = true;
+        mouse_startX = event.clientX;
+        mouse_startY = event.clientY;
 
+    });
+
+    
+    canvas.addEventListener("mousemove", function (event) {
+        console.log("Mouse move", event);
+        if (isClicked){
+            let deltaX = event.clientX - mouse_startX;
+            let deltaY = event.clientY - mouse_startY;
+            panxValue += (2 * deltaX / canvas.width) * (1/zoomValue);
+            panyValue -= (2 * deltaY / canvas.height) * (1/zoomValue);
+            mouse_startX = event.clientX;
+            mouse_startY = event.clientY;
+            console.log("Panning to: ", panxValue, panyValue);
+        }
     });
 
     canvas.addEventListener("mouseup", function (event) {
         console.log("Mouse up", event);
-    });
-    canvas.addEventListener("mousemove", function (event) {
-        console.log("Mouse move", event);
+        isClicked = false;
     });
 
     canvas.addEventListener("wheel", function (event) {
