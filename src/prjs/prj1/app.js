@@ -3,25 +3,29 @@ import { loadShadersFromURLS, buildProgramFromSources, setupWebGL } from "../../
 let canvas;
 let gl;
 let program;
+
+// Variable buffer to be accessed in any call 
+let aBuffer;
 // Create vao
 let vao;
-
-// Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
-let samplePointsN = 60000;
 
 // Flag for drawing points or lines
 let drawPoints = false;
 
 // Uniforms
-let u_curveFamily, u_samplePoints, u_a, u_b, u_c;
+let u_curveFamily, u_samplePoints, u_panx, u_pany, u_zoom, u_a, u_b, u_c;
 
 // Values for uniforms 
 let curveFamilyValue = 0;
+// Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
+let samplePointsN = 60000;
+// Values for a, b, c
 let aValue, bValue, cValue;
+// Values for panning and zooming
+let panxValue = 0.0;
+let panyValue = 0.0;
+let zoomValue = 1.0;
 
-
-// Variable buffer to be accessed in any call 
-let aBuffer;
 
 // Call same functions as in SETUP but on keystroke update in order to refresh the aBuffer contents
 function updateSamplePoints(step){
@@ -110,6 +114,9 @@ function setup(shaders) {
     // Setup location for uniforms
     u_curveFamily = gl.getUniformLocation(program, "u_curveFamily");
     u_samplePoints = gl.getUniformLocation(program, "u_samplePoints");
+    u_panx = gl.getUniformLocation(program, "u_panx");
+    u_pany = gl.getUniformLocation(program, "u_pany");
+    u_zoom = gl.getUniformLocation(program, "u_zoom");
     u_a = gl.getUniformLocation(program, "u_a");
     u_b = gl.getUniformLocation(program, "u_b");
     u_c = gl.getUniformLocation(program, "u_c");
@@ -152,8 +159,13 @@ function setup(shaders) {
                 break;
             case "r":
                 console.log("Restart Program");
-                //more default values
                 updateSamplePoints(0);
+                zoomValue = 1.0;
+                panxValue = 0.0;
+                panyValue = 0.0;
+                aValue = 1.0;
+                bValue = 1.0;
+                cValue = 0.0;    
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
@@ -192,7 +204,32 @@ function setup(shaders) {
         }
     });
 
-    // Handle mouse events
+    // Handle mouse and wheel movement events
+    canvas.addEventListener("mousedown", function (event) {
+        console.log("Mouse down", event);
+        let mouse_startX = event.clientX;
+        let mouse_startY = event.clientY;
+
+    });
+
+    canvas.addEventListener("mouseup", function (event) {
+        console.log("Mouse up", event);
+    });
+    canvas.addEventListener("mousemove", function (event) {
+        console.log("Mouse move", event);
+    });
+
+    canvas.addEventListener("wheel", function (event) {
+        console.log("Mouse wheel", event);
+        if (event.deltaY < 0) {
+            // Zoom in
+            zoomValue *= 1.1;
+        }
+        else {
+            // Zoom out
+            zoomValue *= 0.9;
+        }
+    });
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -201,8 +238,7 @@ function setup(shaders) {
 
 function animate(timestamp) {
     window.requestAnimationFrame(animate);
-
-
+    // Clear the framebuffer
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
@@ -210,6 +246,9 @@ function animate(timestamp) {
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
     gl.uniform1f(u_samplePoints, samplePointsN);
+    gl.uniform1f(u_panx, panxValue);
+    gl.uniform1f(u_pany, panyValue);
+    gl.uniform1f(u_zoom, zoomValue);
 
     // hard coded for testing
     aValue = 5.4;
@@ -219,7 +258,6 @@ function animate(timestamp) {
     gl.uniform1f(u_a, aValue);
     gl.uniform1f(u_b, bValue);
     gl.uniform1f(u_c, cValue);
-
 
     // Bind vao
     gl.bindVertexArray(vao);
