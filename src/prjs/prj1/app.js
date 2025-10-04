@@ -165,7 +165,7 @@ function setup(shaders) {
                 curveFamilyValue = 6;
                 break;
             case "r":
-                console.log("Restart Program");
+                console.log("Restart Curve and View Parameters");
                 updateSamplePoints(0);
                 zoomValue = 1.0;
                 panxValue = 0.0;
@@ -220,12 +220,16 @@ function setup(shaders) {
 
     });
 
-    
+    // Handle mouse move only if clicked
     canvas.addEventListener("mousemove", function (event) {
         console.log("Mouse move", event);
         if (isClicked){
             let deltaX = event.clientX - mouse_startX;
             let deltaY = event.clientY - mouse_startY;
+            // Update pan values based on mouse movement and current zoom level
+            // Invert y axis movement for intuitive panning
+            // Scale movement by canvas dimensions to maintain consistent panning speed
+            // Convert pixel movement to normalized device coordinates in clip space
             panxValue += (2 * deltaX / canvas.width) * (1/zoomValue);
             panyValue -= (2 * deltaY / canvas.height) * (1/zoomValue);
             mouse_startX = event.clientX;
@@ -234,11 +238,13 @@ function setup(shaders) {
         }
     });
 
+    // On mouse up stop panning
     canvas.addEventListener("mouseup", function (event) {
         console.log("Mouse up", event);
         isClicked = false;
     });
 
+    // Mouse wheel for zooming
     canvas.addEventListener("wheel", function (event) {
         console.log("Mouse wheel", event);
         if (event.deltaY < 0) {
