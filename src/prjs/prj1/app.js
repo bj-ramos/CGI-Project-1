@@ -10,24 +10,29 @@ let vao;
 let drawPoints = false;
 
 // Uniforms
-let u_curveFamily, u_a, u_b, u_c;
+let u_curveFamily, u_a, u_b, u_c, u_tMin, u_tMax;
 
 // Values for uniforms 
 let curveFamilyValue = 0;
-let aValue = 1.0;
-let bValue = 1.0;
-let cValue = 0.0;
 
+// Coefficient array - easier to manage (a, b, c)
+let coefficients = [1.0, 0.0, 1.0];
+let selectedCoefIndex = 0; // Which coefficient is currently selected
 
-//Parameter range for t
+// Parameter range for t
 let tMin = 0.0;
-let tMax = 6.283185;
+let tMax = 6.283185; // 2*PI
 
-const MIN_NUM_POINTS = 0;
+// Step sizes for adjustments
+const COEF_STEP = 0.1;
+const COEF_BIG_STEP = 1.0;
+const T_STEP = 0.1;
+
+// Points control
 const MAX_NUM_POINTS = 60000;
-let current_num_Points = 60000;
 
-/// Function to update the Info panel
+
+// Function to update the Info panel
 function updateInfoPanel() {
     const curveEl = document.getElementById('curve-number');
     const tMinEl = document.getElementById('t-min');
@@ -44,9 +49,55 @@ function updateInfoPanel() {
     tMinEl.textContent = tMin.toFixed(2);
     tMaxEl.textContent = tMax.toFixed(2);
 
-    // Format coefficients based on curve family
-    let coefsText = `[${aValue.toFixed(2)}, ${bValue.toFixed(2)}, ${cValue.toFixed(2)}]`;
+    // Format coefficients with highlighting for selected one
+    let coefsText = '[';
+    for (let i = 0; i < coefficients.length; i++) {
+        if (i === selectedCoefIndex) {
+            coefsText += `**${coefficients[i].toFixed(2)}**`;
+        } else {
+            coefsText += coefficients[i].toFixed(2);
+        }
+        if (i < coefficients.length - 1) {
+            coefsText += ', ';
+        }
+    }
+    coefsText += ']';
+
     coefsEl.textContent = coefsText;
+}
+
+// Coefficient selection functions
+function selectNextCoefficient() {
+    selectedCoefIndex = (selectedCoefIndex + 1) % coefficients.length;
+    console.log(`Selected coefficient ${selectedCoefIndex}: ${coefficients[selectedCoefIndex]}`);
+}
+
+function selectPreviousCoefficient() {
+    selectedCoefIndex = (selectedCoefIndex - 1 + coefficients.length) % coefficients.length;
+    console.log(`Selected coefficient ${selectedCoefIndex}: ${coefficients[selectedCoefIndex]}`);
+}
+
+// Coefficient modification functions
+function increaseSelectedCoefficient(step = COEF_STEP) {
+    coefficients[selectedCoefIndex] += step;
+    console.log(`Coefficient ${selectedCoefIndex} increased to ${coefficients[selectedCoefIndex].toFixed(2)}`);
+}
+
+function decreaseSelectedCoefficient(step = COEF_STEP) {
+    coefficients[selectedCoefIndex] -= step;
+    console.log(`Coefficient ${selectedCoefIndex} decreased to ${coefficients[selectedCoefIndex].toFixed(2)}`);
+}
+
+// T limit modification functions
+function increaseT() {
+    tMax += T_STEP;
+    console.log(`t max increased to ${tMax.toFixed(2)}`);
+}
+
+function decreaseT() {
+    tMax -= T_STEP;
+    if (tMax < tMin) tMax = tMin; // Prevent tMax from going below tMin
+    console.log(`t max decreased to ${tMax.toFixed(2)}`);
 }
 
 function resize(target) {
@@ -77,15 +128,15 @@ function setup(shaders) {
 
     resize(window);
 
-    // Populate an array with unsigned int values from 0 to 60000 
-    let a_position_array = new Uint32Array(current_num_Points);
-    for (let i = 0; i < current_num_Points; i++) {
+    // Populate an array with unsigned int values from 0 to MAX_NUM_POINTS 
+    let a_position_array = new Uint32Array(MAX_NUM_POINTS);
+    for (let i = 0; i < MAX_NUM_POINTS; i++) {
         a_position_array[i] = i;
     }
 
     console.log(a_position_array);
 
-    // Create attribute buffer, bind it and read array data into it
+    // Create attribute buffer, bind it and read array into it
     const aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
@@ -104,6 +155,8 @@ function setup(shaders) {
     u_a = gl.getUniformLocation(program, "u_a");
     u_b = gl.getUniformLocation(program, "u_b");
     u_c = gl.getUniformLocation(program, "u_c");
+    u_tMin = gl.getUniformLocation(program, "u_tMin");
+    u_tMax = gl.getUniformLocation(program, "u_tMax");
 
     // Initial update of info panel
     updateInfoPanel();
@@ -117,112 +170,74 @@ function setup(shaders) {
     window.addEventListener("keydown", function (event) {
         switch (event.key) {
             case "0":
-                console.log("Debug Family 0")
+                console.log("Debug Family 0");
                 curveFamilyValue = 0;
-                updateInfoPanel();
                 break;
             case "1":
                 console.log("Draw Family 1");
                 curveFamilyValue = 1;
-                updateInfoPanel();
                 break;
             case "2":
                 console.log("Draw Family 2");
                 curveFamilyValue = 2;
-                updateInfoPanel();
                 break;
             case "3":
                 console.log("Draw Family 3");
                 curveFamilyValue = 3;
-                updateInfoPanel();
                 break;
             case "4":
                 console.log("Draw Family 4");
                 curveFamilyValue = 4;
-                updateInfoPanel();
                 break;
             case "5":
                 console.log("Draw Family 5");
                 curveFamilyValue = 5;
-                updateInfoPanel();
                 break;
             case "6":
                 console.log("Draw Family 6");
                 curveFamilyValue = 6;
-                updateInfoPanel();
                 break;
             case "r":
                 console.log("Restart Coefficients");
-                aValue = 1.0;
-                bValue = 1.0;
-                cValue = 0.0;
+                coefficients = [1.0, 1.0, 0.0];
+                selectedCoefIndex = 0;
                 tMin = 0.0;
                 tMax = 6.283185;
-                updateInfoPanel();
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
                 drawPoints = !drawPoints;
-                updateInfoPanel();
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
                 break;
             case "ArrowLeft":
-                console.log("ArrowLeft");
-                // I think this and ArrowRight should select which coef is going to be changed by the user
-                // Using some kind of array or carousel type thing, maybe a simple boolean or flag system
-                // select_next_coefficient()
-                updateInfoPanel();
+                console.log("ArrowLeft - Select previous coefficient");
+                selectPreviousCoefficient();
                 break;
             case "ArrowRight":
-                console.log("ArrowRight");
-                // I think this and ArrowLeft should select which coef is going to be changed by the user
-                // Using some kind of array or carousel type thing, maybe a simple boolean or flag system
-                // select_previous_coefficient()
-                updateInfoPanel();
+                console.log("ArrowRight - Select next coefficient");
+                selectNextCoefficient();
                 break;
             case "ArrowUp":
-                console.log("ArrowUp");
-                // This and ArrowDown will then increase and decrease, respectively, the currently selected coeficcient
-                // increase_selected_coefficient()
-                updateInfoPanel();
+                console.log("ArrowUp - Increase selected coefficient");
+                increaseSelectedCoefficient();
                 break;
             case "ArrowDown":
-                console.log("ArrowDown");
-                // This and ArrowUp will then increase and decrease, respectively, the currently selected coeficcient
-                // decrease_selected_coefficient()
-                updateInfoPanel();
+                console.log("ArrowDown - Decrease selected coefficient");
+                decreaseSelectedCoefficient();
                 break;
             case "PageUp":
-                console.log("PageUp");
-                // PageUp and PageDown will increase and decrease, respectively, the limit (t)
-                // increase_t()
-                updateInfoPanel();
+                console.log("PageUp - Increase t max");
+                increaseT();
                 break;
             case "PageDown":
-                console.log("PageDown");
-                // PageUp and PageDown will increase and decrease, respectively, the limit (t)
-                // decrease_t()
-                updateInfoPanel();
+                console.log("PageDown - Decrease t max");
+                decreaseT();
                 break;
-            case "+":
-                //draft idea
-                console.log("Plus key");
-                if (!(current_num_Points == MAX_NUM_POINTS)) {
-                    current_num_Points += 500
-                }
-                setup()
-                break;
-            case "-":
-                //draft idea
-                console.log("Minus Key");
-                if (!(current_num_Points == MIN_NUM_POINTS)) {
-                    current_num_Points -= 500
-                }
-                setup()
-                break;
+
         }
+        updateInfoPanel();
     });
 
     // Handle mouse events
@@ -235,27 +250,27 @@ function setup(shaders) {
 function animate(timestamp) {
     window.requestAnimationFrame(animate);
 
-
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
 
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
-    gl.uniform1f(u_a, aValue);
-    gl.uniform1f(u_b, bValue);
-    gl.uniform1f(u_c, cValue);
-
+    gl.uniform1f(u_a, coefficients[0]);
+    gl.uniform1f(u_b, coefficients[1]);
+    gl.uniform1f(u_c, coefficients[2]);
+    gl.uniform1f(u_tMin, tMin);
+    gl.uniform1f(u_tMax, tMax);
 
     // Bind vao
     gl.bindVertexArray(vao);
 
     // Drawing code
     if (drawPoints) {
-        gl.drawArrays(gl.POINTS, 0, 60000);
+        gl.drawArrays(gl.POINTS, 0, MAX_NUM_POINTS);
     }
     else {
-        gl.drawArrays(gl.LINE_STRIP, 0, 60000);
+        gl.drawArrays(gl.LINE_STRIP, 0, MAX_NUM_POINTS);
     }
 
     gl.bindVertexArray(null);
