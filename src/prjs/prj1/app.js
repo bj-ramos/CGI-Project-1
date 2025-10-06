@@ -4,11 +4,6 @@ let canvas;
 let gl;
 let program;
 
-// Variable buffer to be accessed in any call 
-let aBuffer;
-// Create vao
-let vao;
-
 // Create vao
 let vao;
 
@@ -24,15 +19,9 @@ let drawPoints = false;
 // Flag for mouse click and drag
 let isClicked = false;
 
-// Uniforms
-let u_curveFamily, u_samplePoints, u_panx, u_pany, u_zoom, u_a, u_b, u_c;
-
 // Values for uniforms 
 let curveFamilyValue = 0;
-// Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
-let samplePointsN = 60000;
-// Values for a, b, c
-let aValue, bValue, cValue;
+
 // Values for panning and zooming
 let panxValue = 0.0;
 let panyValue = 0.0;
@@ -40,10 +29,7 @@ let zoomValue = 1.0;
 
 // Values for mouse panning
 let mouse_startX, mouse_startY;
-let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax;
-
-// Values for uniforms 
-let curveFamilyValue = 0;
+let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax, u_panx, u_pany, u_zoom;
 
 // Coefficient array - easier to manage (a, b, c)
 let coefficients = [1.0, 0.0, 1.0];
@@ -153,7 +139,6 @@ function updateSamplePoints(step){
     }
 
     // Create fresh attribute buffer, bind it and read array data into it
-
     aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
@@ -164,7 +149,6 @@ function updateSamplePoints(step){
     gl.vertexAttribIPointer(a_position, 1, gl.UNSIGNED_INT, false, 0, 0);
     gl.enableVertexAttribArray(a_position);
     gl.bindVertexArray(null);
-
    
 }
 
@@ -270,15 +254,13 @@ function setup(shaders) {
                 curveFamilyValue = 6;
                 break;
             case "r":
-                console.log("Restart Curve and View Parameters");
-                updateSamplePoints(0);
+                // Reset everything to default values
+                console.log("Restart Curve Family");
+                /** Not sure if we want to reset view parameters too
                 zoomValue = 1.0;
                 panxValue = 0.0;
                 panyValue = 0.0;
-                aValue = 1.0;
-                bValue = 1.0;
-                cValue = 0.0;    
-                // Reset everything to default values
+                */   
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
                 coefficients = [1.0, 1.0, 0.0];
@@ -382,7 +364,7 @@ function setup(shaders) {
 
 function animate(timestamp) {
     window.requestAnimationFrame(animate);
-    // Clear the framebuffer
+
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
@@ -393,7 +375,6 @@ function animate(timestamp) {
     gl.uniform1f(u_panx, panxValue);
     gl.uniform1f(u_pany, panyValue);
     gl.uniform1f(u_zoom, zoomValue);
-
     gl.uniform1f(u_a, coefficients[0]);
     gl.uniform1f(u_b, coefficients[1]);
     gl.uniform1f(u_c, coefficients[2]);
