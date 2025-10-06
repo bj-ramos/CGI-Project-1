@@ -10,11 +10,95 @@ let vao;
 let drawPoints = false;
 
 // Uniforms
-let u_curveFamily, u_a, u_b, u_c;
+let u_curveFamily, u_a, u_b, u_c, u_tMin, u_tMax;
 
 // Values for uniforms 
 let curveFamilyValue = 0;
-let aValue, bValue, cValue;
+
+// Coefficient array - easier to manage (a, b, c)
+let coefficients = [1.0, 0.0, 1.0];
+let selectedCoefIndex = 0; // Which coefficient is currently selected
+
+// Parameter range for t
+let tMin = 0.0;
+let tMax = 6.283185; // 2*PI
+
+// Step sizes for adjustments
+const COEF_STEP = 0.1;
+const COEF_BIG_STEP = 1.0;
+const T_STEP = 0.1;
+
+// Points control
+const MAX_NUM_POINTS = 60000;
+
+
+// Function to update the Info panel
+function updateInfoPanel() {
+    const curveEl = document.getElementById('curve-number');
+    const tMinEl = document.getElementById('t-min');
+    const tMaxEl = document.getElementById('t-max');
+    const coefsEl = document.getElementById('coefs');
+
+    // Safety check - make sure elements exist
+    if (!curveEl || !tMinEl || !tMaxEl || !coefsEl) {
+        console.error('Info panel elements not found!');
+        return;
+    }
+
+    curveEl.textContent = curveFamilyValue;
+    tMinEl.textContent = tMin.toFixed(2);
+    tMaxEl.textContent = tMax.toFixed(2);
+
+    // Format coefficients with highlighting for selected one
+    let coefsText = '[';
+    for (let i = 0; i < coefficients.length; i++) {
+        if (i === selectedCoefIndex) {
+            coefsText += `**${coefficients[i].toFixed(2)}**`;
+        } else {
+            coefsText += coefficients[i].toFixed(2);
+        }
+        if (i < coefficients.length - 1) {
+            coefsText += ', ';
+        }
+    }
+    coefsText += ']';
+
+    coefsEl.textContent = coefsText;
+}
+
+// Coefficient selection functions
+function selectNextCoefficient() {
+    selectedCoefIndex = (selectedCoefIndex + 1) % coefficients.length;
+    console.log(`Selected coefficient ${selectedCoefIndex}: ${coefficients[selectedCoefIndex]}`);
+}
+
+function selectPreviousCoefficient() {
+    selectedCoefIndex = (selectedCoefIndex - 1 + coefficients.length) % coefficients.length;
+    console.log(`Selected coefficient ${selectedCoefIndex}: ${coefficients[selectedCoefIndex]}`);
+}
+
+// Coefficient modification functions
+function increaseSelectedCoefficient(step = COEF_STEP) {
+    coefficients[selectedCoefIndex] += step;
+    console.log(`Coefficient ${selectedCoefIndex} increased to ${coefficients[selectedCoefIndex].toFixed(2)}`);
+}
+
+function decreaseSelectedCoefficient(step = COEF_STEP) {
+    coefficients[selectedCoefIndex] -= step;
+    console.log(`Coefficient ${selectedCoefIndex} decreased to ${coefficients[selectedCoefIndex].toFixed(2)}`);
+}
+
+// T limit modification functions
+function increaseT() {
+    tMax += T_STEP;
+    console.log(`t max increased to ${tMax.toFixed(2)}`);
+}
+
+function decreaseT() {
+    tMax -= T_STEP;
+    if (tMax < tMin) tMax = tMin; // Prevent tMax from going below tMin
+    console.log(`t max decreased to ${tMax.toFixed(2)}`);
+}
 
 function resize(target) {
     // Aquire the new window dimensions
@@ -44,15 +128,15 @@ function setup(shaders) {
 
     resize(window);
 
-    // Populate an array with unsigned int values from 0 to 60000 
-    let a_position_array = new Uint32Array(60000);
-    for (let i = 0; i < 60000; i++){
+    // Populate an array with unsigned int values from 0 to MAX_NUM_POINTS 
+    let a_position_array = new Uint32Array(MAX_NUM_POINTS);
+    for (let i = 0; i < MAX_NUM_POINTS; i++) {
         a_position_array[i] = i;
     }
 
     console.log(a_position_array);
 
-    // Create attribute buffer, bind it and read array data into it
+    // Create attribute buffer, bind it and read array into it
     const aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);
@@ -71,6 +155,11 @@ function setup(shaders) {
     u_a = gl.getUniformLocation(program, "u_a");
     u_b = gl.getUniformLocation(program, "u_b");
     u_c = gl.getUniformLocation(program, "u_c");
+    u_tMin = gl.getUniformLocation(program, "u_tMin");
+    u_tMax = gl.getUniformLocation(program, "u_tMax");
+
+    // Initial update of info panel
+    updateInfoPanel();
 
     // Handle resize events 
     window.addEventListener("resize", (event) => {
@@ -78,10 +167,10 @@ function setup(shaders) {
     });
 
     // Handle keyboard events
-    window.addEventListener("keydown", function (event){
-        switch(event.key){
+    window.addEventListener("keydown", function (event) {
+        switch (event.key) {
             case "0":
-                console.log("Debug Family 0")
+                console.log("Debug Family 0");
                 curveFamilyValue = 0;
                 break;
             case "1":
@@ -90,7 +179,7 @@ function setup(shaders) {
                 break;
             case "2":
                 console.log("Draw Family 2");
-                curveFamilyValue= 2;
+                curveFamilyValue = 2;
                 break;
             case "3":
                 console.log("Draw Family 3");
@@ -109,8 +198,11 @@ function setup(shaders) {
                 curveFamilyValue = 6;
                 break;
             case "r":
-                console.log("Restart Program");
-                curveFamilyValue = 0;
+                console.log("Restart Coefficients");
+                coefficients = [1.0, 1.0, 0.0];
+                selectedCoefIndex = 0;
+                tMin = 0.0;
+                tMax = 6.283185;
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
@@ -120,25 +212,32 @@ function setup(shaders) {
                 console.log("Toggle Auto Animation");
                 break;
             case "ArrowLeft":
-                console.log("ArrowLeft");
+                console.log("ArrowLeft - Select previous coefficient");
+                selectPreviousCoefficient();
                 break;
             case "ArrowRight":
-                console.log("ArrowRight");
+                console.log("ArrowRight - Select next coefficient");
+                selectNextCoefficient();
                 break;
             case "ArrowUp":
-                console.log("ArrowUp");
+                console.log("ArrowUp - Increase selected coefficient");
+                increaseSelectedCoefficient();
                 break;
             case "ArrowDown":
-                console.log("ArrowDown");
+                console.log("ArrowDown - Decrease selected coefficient");
+                decreaseSelectedCoefficient();
                 break;
             case "PageUp":
-                console.log("PageUp");
+                console.log("PageUp - Increase t max");
+                increaseT();
                 break;
             case "PageDown":
-                console.log("PageDown");
+                console.log("PageDown - Decrease t max");
+                decreaseT();
                 break;
-            
+
         }
+        updateInfoPanel();
     });
 
     // Handle mouse events
@@ -151,35 +250,29 @@ function setup(shaders) {
 function animate(timestamp) {
     window.requestAnimationFrame(animate);
 
-
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
 
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
-
-    // hard coded for testing
-    aValue = 5.4;
-    bValue = 2.8;
-    cValue = 1.2;
-
-    gl.uniform1f(u_a, aValue);
-    gl.uniform1f(u_b, bValue);
-    gl.uniform1f(u_c, cValue);
-
+    gl.uniform1f(u_a, coefficients[0]);
+    gl.uniform1f(u_b, coefficients[1]);
+    gl.uniform1f(u_c, coefficients[2]);
+    gl.uniform1f(u_tMin, tMin);
+    gl.uniform1f(u_tMax, tMax);
 
     // Bind vao
     gl.bindVertexArray(vao);
 
     // Drawing code
-    if(drawPoints){
-        gl.drawArrays(gl.POINTS, 0, 60000);
+    if (drawPoints) {
+        gl.drawArrays(gl.POINTS, 0, MAX_NUM_POINTS);
     }
-    else{
-        gl.drawArrays(gl.LINE_STRIP, 0, 60000);
+    else {
+        gl.drawArrays(gl.LINE_STRIP, 0, MAX_NUM_POINTS);
     }
-    
+
     gl.bindVertexArray(null);
 }
 
