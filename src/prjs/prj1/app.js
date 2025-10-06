@@ -124,6 +124,13 @@ function updateSamplePoints(step){
     }
     console.log("Updated sample points:", samplePointsN);
 
+    // Delete old buffer if it exists
+    if (aBuffer) {
+        gl.deleteBuffer(aBuffer);
+    }
+
+    // Create fresh attribute buffer, bind it and read array data into it
+
     aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, a_position_array, gl.STATIC_DRAW);

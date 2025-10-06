@@ -1,7 +1,7 @@
 #version 300 es
 in uint a_position;
-uniform float u_aspect;
 uniform int u_curveFamily;
+uniform float u_aspect;
 uniform float u_samplePoints;
 uniform float u_a;
 uniform float u_b;
@@ -14,7 +14,7 @@ void main() {
     * Map index [0,60000] → angle [u_tMin, u_tMax]
     * (since all curves are built with sin and cos, this normalization works for every situation)
     */
-    float t = mix(u_tMin, u_tMax, float(a_position) / 60000.0f);
+    float t = mix(u_tMin, u_tMax, float(a_position) / u_samplePoints);
 
     //Declare x and y
     float x = 0.0f;
