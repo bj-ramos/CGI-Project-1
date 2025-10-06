@@ -4,6 +4,11 @@ let canvas;
 let gl;
 let program;
 
+// Variable buffer to be accessed in any call 
+let aBuffer;
+// Create vao
+let vao;
+
 // Create vao
 let vao;
 
@@ -16,7 +21,25 @@ let samplePointsN = 60000;
 // Flag for drawing points or lines
 let drawPoints = false;
 
+// Flag for mouse click and drag
+let isClicked = false;
+
 // Uniforms
+let u_curveFamily, u_samplePoints, u_panx, u_pany, u_zoom, u_a, u_b, u_c;
+
+// Values for uniforms 
+let curveFamilyValue = 0;
+// Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
+let samplePointsN = 60000;
+// Values for a, b, c
+let aValue, bValue, cValue;
+// Values for panning and zooming
+let panxValue = 0.0;
+let panyValue = 0.0;
+let zoomValue = 1.0;
+
+// Values for mouse panning
+let mouse_startX, mouse_startY;
 let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax;
 
 // Values for uniforms 
@@ -198,6 +221,9 @@ function setup(shaders) {
     // Setup location for uniforms
     u_curveFamily = gl.getUniformLocation(program, "u_curveFamily");
     u_samplePoints = gl.getUniformLocation(program, "u_samplePoints");
+    u_panx = gl.getUniformLocation(program, "u_panx");
+    u_pany = gl.getUniformLocation(program, "u_pany");
+    u_zoom = gl.getUniformLocation(program, "u_zoom");
     u_a = gl.getUniformLocation(program, "u_a");
     u_b = gl.getUniformLocation(program, "u_b");
     u_c = gl.getUniformLocation(program, "u_c");
@@ -244,6 +270,14 @@ function setup(shaders) {
                 curveFamilyValue = 6;
                 break;
             case "r":
+                console.log("Restart Curve and View Parameters");
+                updateSamplePoints(0);
+                zoomValue = 1.0;
+                panxValue = 0.0;
+                panyValue = 0.0;
+                aValue = 1.0;
+                bValue = 1.0;
+                cValue = 0.0;    
                 // Reset everything to default values
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
@@ -295,7 +329,51 @@ function setup(shaders) {
         updateInfoPanel();
     });
 
-    // Handle mouse events
+    // Handle mouse and wheel movement events
+    canvas.addEventListener("mousedown", function (event) {
+        console.log("Mouse down", event);
+        isClicked = true;
+        mouse_startX = event.clientX;
+        mouse_startY = event.clientY;
+
+    });
+
+    // Handle mouse move only if clicked
+    canvas.addEventListener("mousemove", function (event) {
+        console.log("Mouse move", event);
+        if (isClicked){
+            let deltaX = event.clientX - mouse_startX;
+            let deltaY = event.clientY - mouse_startY;
+            // Update pan values based on mouse movement and current zoom level
+            // Invert y axis movement for intuitive panning
+            // Scale movement by canvas dimensions to maintain consistent panning speed
+            // Convert pixel movement to normalized device coordinates in clip space
+            panxValue += (2 * deltaX / canvas.width) * (1/zoomValue);
+            panyValue -= (2 * deltaY / canvas.height) * (1/zoomValue);
+            mouse_startX = event.clientX;
+            mouse_startY = event.clientY;
+            console.log("Panning to: ", panxValue, panyValue);
+        }
+    });
+
+    // On mouse up stop panning
+    canvas.addEventListener("mouseup", function (event) {
+        console.log("Mouse up", event);
+        isClicked = false;
+    });
+
+    // Mouse wheel for zooming
+    canvas.addEventListener("wheel", function (event) {
+        console.log("Mouse wheel", event);
+        if (event.deltaY < 0) {
+            // Zoom in
+            zoomValue *= 1.1;
+        }
+        else {
+            // Zoom out
+            zoomValue *= 0.9;
+        }
+    });
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -304,7 +382,7 @@ function setup(shaders) {
 
 function animate(timestamp) {
     window.requestAnimationFrame(animate);
-
+    // Clear the framebuffer
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
@@ -312,6 +390,9 @@ function animate(timestamp) {
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
     gl.uniform1f(u_samplePoints, samplePointsN);
+    gl.uniform1f(u_panx, panxValue);
+    gl.uniform1f(u_pany, panyValue);
+    gl.uniform1f(u_zoom, zoomValue);
 
     gl.uniform1f(u_a, coefficients[0]);
     gl.uniform1f(u_b, coefficients[1]);

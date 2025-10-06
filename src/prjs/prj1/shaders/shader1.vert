@@ -3,6 +3,9 @@ in uint a_position;
 uniform int u_curveFamily;
 uniform float u_aspect;
 uniform float u_samplePoints;
+uniform float u_panx;
+uniform float u_pany;
+uniform float u_zoom;
 uniform float u_a;
 uniform float u_b;
 uniform float u_c;
@@ -53,7 +56,8 @@ void main() {
     }
 
     //Dividing x by the aspect ratio gives us an always square proportion
-    gl_Position = vec4(x / u_aspect, y, 0.0f, 1.0f);
+    gl_Position = vec4(((x + u_panx) / u_aspect) * u_zoom, (y + u_pany) * u_zoom, 0.0, 1.0);
+
     //Defines the pixel size of each point
     gl_PointSize = 5.0f;
 }
