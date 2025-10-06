@@ -3,8 +3,12 @@ import { loadShadersFromURLS, buildProgramFromSources, setupWebGL } from "../../
 let canvas;
 let gl;
 let program;
+
 // Create vao
 let vao;
+
+// Variable buffer to be accessed in any call 
+let aBuffer;
 
 // Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
 let samplePointsN = 60000;
@@ -13,8 +17,7 @@ let samplePointsN = 60000;
 let drawPoints = false;
 
 // Uniforms
-let u_curveFamily, u_samplePoints, u_a, u_b, u_c;
-let u_curveFamily, u_a, u_b, u_c, u_tMin, u_tMax;
+let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax;
 
 // Values for uniforms 
 let curveFamilyValue = 0;
@@ -31,9 +34,6 @@ let tMax = 6.283185; // 2*PI
 const COEF_STEP = 0.1;
 const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
-
-// Points control
-const MAX_NUM_POINTS = 60000;
 
 
 // Function to update the Info panel
@@ -105,9 +105,6 @@ function decreaseT() {
 }
 
 
-// Variable buffer to be accessed in any call 
-let aBuffer;
-
 // Call same functions as in SETUP but on keystroke update in order to refresh the aBuffer contents
 function updateSamplePoints(step){
 
@@ -125,8 +122,7 @@ function updateSamplePoints(step){
     for (let i = 0; i < samplePointsN; i++){
         a_position_array[i] = i;
     }
-
-    console.log(a_position_array);
+    console.log("Updated sample points:", samplePointsN);
 
     aBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, aBuffer);
@@ -241,8 +237,7 @@ function setup(shaders) {
                 curveFamilyValue = 6;
                 break;
             case "r":
-                console.log("Restart Program");
-                //more default values
+                // Reset everything to default values
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
                 coefficients = [1.0, 1.0, 0.0];
@@ -289,8 +284,6 @@ function setup(shaders) {
                 console.log("Step sample down by 500 points");
                 updateSamplePoints(-500);
                 break;
-            
-
         }
         updateInfoPanel();
     });
@@ -312,15 +305,6 @@ function animate(timestamp) {
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
     gl.uniform1f(u_samplePoints, samplePointsN);
-
-    // hard coded for testing
-    aValue = 5.4;
-    bValue = 2.8;
-    cValue = 1.2;
-
-    gl.uniform1f(u_a, aValue);
-    gl.uniform1f(u_b, bValue);
-    gl.uniform1f(u_c, cValue);
 
     gl.uniform1f(u_a, coefficients[0]);
     gl.uniform1f(u_b, coefficients[1]);

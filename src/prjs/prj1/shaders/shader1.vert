@@ -31,24 +31,24 @@ void main() {
             y = sin(u_a * t) + sin(u_b * t) / 2.0f + cos(u_c * t) / 3.0f;
             break;
         case 2:
-            x = 2.0 * (cos(u_a*t) + ((cos(u_b*t)) * (cos(u_b*t)) * (cos(u_b*t))));
-            y = 2.0 * (sin(u_a*t) + ((sin(u_b*t)) * (sin(u_b*t)) * (sin(u_b*t))));
+            x = 2.0 * (cos(u_a * t) + ((cos(u_b * t)) * (cos(u_b * t)) * (cos(u_b * t))));
+            y = 2.0 * (sin(u_a * t) + ((sin(u_b * t)) * (sin(u_b * t)) * (sin(u_b * t))));
             break;
         case 3:
-            x = cos(u_a*t) * sin(sin(u_a*t));
-            y = sin(u_a*t) * cos(cos(u_b*t));
+            x = cos(u_a * t) * sin(sin(u_a * t));
+            y = sin(u_a * t) * cos(cos(u_b * t));
             break;
         case 4:
-            x = cos(u_a*t) * cos(u_b*t);
-            y = sin(cos(u_a*t));
+            x = cos(u_a * t) * cos(u_b * t);
+            y = sin(cos(u_a * t));
             break;
         case 5:
-            x = sin(u_a*t) * (exp(cos(u_a*t)) - (2.0 * cos(u_b*t)));
-            y = cos(u_a*t) * (exp(cos(u_a*t)) - (2.0 * cos(u_b*t)));
+            x = sin(u_a * t) * (exp(cos(u_a * t)) - (2.0 * cos(u_b * t)));
+            y = cos(u_a * t) * (exp(cos(u_a * t)) - (2.0 * cos(u_b * t)));
             break;
         case 6:
-            x = ((u_a - u_b) * cos(u_b*t)) + cos(u_a*t - u_b*t);
-            y = ((u_a - u_b) * sin(u_b*t)) - sin(u_a*t - u_b*t);
+            x = ((u_a - u_b) * cos(u_b * t)) + cos(u_a * t - u_b * t);
+            y = ((u_a - u_b) * sin(u_b * t)) - sin(u_a * t - u_b * t);
             break;
     }
 
