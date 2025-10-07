@@ -53,8 +53,23 @@ function togglePanelVisibility(infoPanel) {
     }
 }
 
+// Change curve color
+function changeCurveColor(r, g, b, a) {
+    let color = document.getElementById("color-picker").value;
+    r = parseInt(color.slice(1, 3), 16) / 255;
+    g = parseInt(color.slice(3, 5), 16) / 255;
+    b = parseInt(color.slice(5, 7), 16) / 255;
+    a = 1.0; // Opaque
+    const u_color = gl.getUniformLocation(program, "color");
+    gl.useProgram(program);
+    gl.uniform4f(u_color, r, g, b, a);
+}
 
-
+ // Handle color change button update
+    const colorButton = document.getElementById("apply-color-button");
+    colorButton.addEventListener("click", () => {
+        changeCurveColor();
+    });
 
 // Function to update the Info panel
 function updateInfoPanel() {
@@ -230,6 +245,8 @@ function setup(shaders) {
     // Initial update of info panel
     updateInfoPanel();
 
+    // Initial curve color
+    changeCurveColor(1.0, 0.0, 0.0, 1.0); // Red
     // Handle resize events 
     window.addEventListener("resize", (event) => {
         resize(event.target);
