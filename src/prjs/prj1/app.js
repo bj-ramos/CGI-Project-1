@@ -276,10 +276,39 @@ function setup(shaders) {
                 */   
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
-                coefficients = [1.0, 1.0, 0.0];
+                // Reset depends on which family is selected
                 selectedCoefIndex = 0;
                 tMin = 0.0;
-                tMax = 6.283185;
+                switch(curveFamilyValue){
+                    case 0:
+                        coefficients = [1.0, 1.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                    case 1:
+                        coefficients = [1.0, 1.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                    case 2:
+                        coefficients = [1.0, 17.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                    case 3:
+                        coefficients = [1.0, 8.6, 0.0];
+                        tMax = 6.283185 * 5; // 10*PI
+                        break;
+                    case 4:
+                        coefficients = [7.6, 5.1, 0.0];
+                        tMax = 10; // 10
+                        break;
+                    case 5:
+                        coefficients = [1.0, 4.0, 0.0];
+                        tMax = 10; // 10
+                        break;
+                    case 6:
+                        coefficients = [4.0, 1.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                }
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
