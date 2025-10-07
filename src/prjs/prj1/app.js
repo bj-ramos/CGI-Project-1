@@ -29,7 +29,13 @@ let zoomValue = 1.0;
 
 // Values for mouse panning
 let mouse_startX, mouse_startY;
+
+// Uniform locations
 let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax, u_panx, u_pany, u_zoom;
+let u_singleColor, u_startingColor, u_endingColor, u_colorModeFlag;
+
+// Flag for color mode
+let singleColor = true;
 
 // Coefficient array - easier to manage (a, b, c)
 let coefficients = [1.0, 0.0, 1.0];
@@ -45,15 +51,86 @@ const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
 
 
+
+// Toggle interface panel visibility
+function togglePanelVisibility(infoPanel) {
+    if (infoPanel.style.display === 'none') {
+        infoPanel.style.display = 'block';
+    } else {
+        infoPanel.style.display = 'none';
+    }
+}
+
+// Change single curve color
+function changeCurveColor(r, g, b, a) {
+
+    singleColor = true; // Switch to single color mode
+
+    // Get color from color picker
+    let color = document.getElementById("color-picker").value;
+    r = parseInt(color.slice(1, 3), 16) / 255;
+    g = parseInt(color.slice(3, 5), 16) / 255;
+    b = parseInt(color.slice(5, 7), 16) / 255;
+    a = 1.0; // Opaque
+
+    // Set uniform value in shader
+    u_singleColor = gl.getUniformLocation(program, "u_singleColor");
+    gl.useProgram(program);
+    gl.uniform4f(u_singleColor, r, g, b, a);
+}
+
+ // Handle single color change button update
+const colorButton = document.getElementById("apply-color-button");
+colorButton.addEventListener("click", () => {
+    changeCurveColor();
+});
+
+// Change gradient curve color
+function changeGradientCurveColor() {
+
+    singleColor = false; // Switch to gradient mode
+
+    // Get colors from color pickers
+    let startingColorValue = document.getElementById("startingColorValue").value;
+    let endingColorValue = document.getElementById("endingColorValue").value;
+
+    // Convert hex colors to normalized RGB
+    let r1 = parseInt(startingColorValue.slice(1, 3), 16) / 255;
+    let g1 = parseInt(startingColorValue.slice(3, 5), 16) / 255;
+    let b1 = parseInt(startingColorValue.slice(5, 7), 16) / 255;
+    let a1 = 1.0; // Opaque
+
+    let r2 = parseInt(endingColorValue.slice(1, 3), 16) / 255;
+    let g2 = parseInt(endingColorValue.slice(3, 5), 16) / 255;
+    let b2 = parseInt(endingColorValue.slice(5, 7), 16) / 255;
+    let a2 = 1.0; // Opaque
+
+    // Set uniform values in shader
+     u_startingColor = gl.getUniformLocation(program, "u_startingColor");
+     u_endingColor = gl.getUniformLocation(program, "u_endingColor");
+
+    // Update shader uniforms
+    gl.useProgram(program);
+    gl.uniform4f(u_startingColor, r1, g1, b1, a1);
+    gl.uniform4f(u_endingColor, r2, g2, b2, a2);
+}
+
+// Handle gradient color change button update
+const gradientButton = document.getElementById("apply-gradient-button");
+gradientButton.addEventListener("click", () => {
+    changeGradientCurveColor();
+});
+
 // Function to update the Info panel
 function updateInfoPanel() {
     const curveEl = document.getElementById('curve-number');
     const tMinEl = document.getElementById('t-min');
     const tMaxEl = document.getElementById('t-max');
     const coefsEl = document.getElementById('coefs');
+    const sampleEl = document.getElementById('sample-size');
 
     // Safety check - make sure elements exist
-    if (!curveEl || !tMinEl || !tMaxEl || !coefsEl) {
+    if (!curveEl || !tMinEl || !tMaxEl || !coefsEl || !sampleEl) {
         console.error('Info panel elements not found!');
         return;
     }
@@ -61,6 +138,7 @@ function updateInfoPanel() {
     curveEl.textContent = curveFamilyValue;
     tMinEl.textContent = tMin.toFixed(2);
     tMaxEl.textContent = tMax.toFixed(2);
+    sampleEl.textContent = samplePointsN;
 
     // Format coefficients with highlighting for selected one
     let coefsText = '[';
@@ -217,6 +295,8 @@ function setup(shaders) {
     // Initial update of info panel
     updateInfoPanel();
 
+    // Initial curve color
+    changeCurveColor(1.0, 0.0, 0.0, 1.0); // Red
     // Handle resize events 
     window.addEventListener("resize", (event) => {
         resize(event.target);
@@ -263,14 +343,48 @@ function setup(shaders) {
                 */   
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
-                coefficients = [1.0, 1.0, 0.0];
+                // Reset depends on which family is selected
                 selectedCoefIndex = 0;
                 tMin = 0.0;
-                tMax = 6.283185;
+                switch(curveFamilyValue){
+                    case 0:
+                        coefficients = [1.0, 1.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                    case 1:
+                        coefficients = [1.0, 1.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                    case 2:
+                        coefficients = [1.0, 17.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                    case 3:
+                        coefficients = [1.0, 8.6, 0.0];
+                        tMax = 6.283185 * 5; // 10*PI
+                        break;
+                    case 4:
+                        coefficients = [7.6, 5.1, 0.0];
+                        tMax = 10; // 10
+                        break;
+                    case 5:
+                        coefficients = [1.0, 4.0, 0.0];
+                        tMax = 10; // 10
+                        break;
+                    case 6:
+                        coefficients = [4.0, 1.0, 0.0];
+                        tMax = 6.283185; // 2*PI
+                        break;
+                }
                 break;
             case "p":
                 console.log("Toggle Draw Mode");
                 drawPoints = !drawPoints;
+                break;
+            case "h":
+                console.log("Toggle User Interface");
+                let panel = this.document.getElementById("overlay2");
+                togglePanelVisibility(panel);
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
@@ -367,6 +481,16 @@ function animate(timestamp) {
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    // Check color mode and set uniform
+    u_colorModeFlag = gl.getUniformLocation(program, "u_colorModeFlag");
+    gl.useProgram(program);
+    if(singleColor){
+        gl.uniform1i(u_colorModeFlag, 1); // true
+    }
+    else{
+        gl.uniform1i(u_colorModeFlag, 0); // false
+    }
+    
     gl.useProgram(program);
 
     // Update uniform values

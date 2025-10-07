@@ -17,6 +17,7 @@
             <div class="info-line">t min: <span id="t-min">0.00</span></div>
             <div class="info-line">t max: <span id="t-max">6.28</span></div>
             <div class="info-line">Coefs: <span id="coefs">[1.00, 1.00, 0.00]</span></div>
+            <div class="info-line">Sample Size: <span id="sample-size">60000</span></div>
         </div>
 
         <div id="overlay2">
@@ -41,7 +42,20 @@
             <div class="key-line">'p' - Toggle Lines/Points</div>
         </div>
 
-    </div>
+        <div id="overlay3">
+            <div class="panel-title">Single Color Picker</div>
+            <input type="color" id="color-picker" name="color-picker" value="#ff0000">
+            <button id="apply-color-button">Apply Color</button>
+        </div>
+
+        <div id="overlay4">
+            <div class="panel-title">Gradient Picker</div>
+            <label>Color 1: <input type="color" id="startingColorValue" value="#ff0000"></label>
+            <label>Color 2: <input type="color" id="endingColorValue" value="#0000ff"></label>
+            <button id="apply-gradient-button">Apply Gradient</button>
+        </div>
+
+    </div>  
 
 
 </body>

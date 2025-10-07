@@ -11,6 +11,7 @@ uniform float u_b;
 uniform float u_c;
 uniform float u_tMin;
 uniform float u_tMax;
+out float v_t;
 
 void main() {
     /**
@@ -19,19 +20,21 @@ void main() {
     */
     float t = mix(u_tMin, u_tMax, float(a_position) / u_samplePoints);
 
+    v_t = float(a_position) / u_samplePoints; 
+
     //Declare x and y
-    float x = 0.0f;
-    float y = 0.0f;
+    float x = 0.0;
+    float y = 0.0;
 
     //Select curve family
     switch(u_curveFamily) {
         case 0:
-            x = cos(t) * 0.5f;
-            y = sin(t) * 0.5f;
+            x = cos(t) * 0.5;
+            y = sin(t) * 0.5;
             break;
         case 1:
-            x = cos(u_a * t) + cos(u_b * t) / 2.0f + sin(u_c * t) / 3.0f;
-            y = sin(u_a * t) + sin(u_b * t) / 2.0f + cos(u_c * t) / 3.0f;
+            x = cos(u_a * t) + cos(u_b * t) / 2.0 + sin(u_c * t) / 3.0;
+            y = sin(u_a * t) + sin(u_b * t) / 2.0 + cos(u_c * t) / 3.0;
             break;
         case 2:
             x = 2.0 * (cos(u_a * t) + ((cos(u_b * t)) * (cos(u_b * t)) * (cos(u_b * t))));
@@ -59,5 +62,5 @@ void main() {
     gl_Position = vec4(((x + u_panx) / u_aspect) * u_zoom, (y + u_pany) * u_zoom, 0.0, 1.0);
 
     //Defines the pixel size of each point
-    gl_PointSize = 5.0f;
+    gl_PointSize = 5.0;
 }
