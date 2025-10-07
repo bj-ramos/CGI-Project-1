@@ -44,6 +44,17 @@ const COEF_STEP = 0.1;
 const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
 
+// Toggle interface panel visibility
+function togglePanelVisibility(infoPanel) {
+    if (infoPanel.style.display === 'none') {
+        infoPanel.style.display = 'block';
+    } else {
+        infoPanel.style.display = 'none';
+    }
+}
+
+
+
 
 // Function to update the Info panel
 function updateInfoPanel() {
@@ -51,9 +62,10 @@ function updateInfoPanel() {
     const tMinEl = document.getElementById('t-min');
     const tMaxEl = document.getElementById('t-max');
     const coefsEl = document.getElementById('coefs');
+    const sampleEl = document.getElementById('sample-size');
 
     // Safety check - make sure elements exist
-    if (!curveEl || !tMinEl || !tMaxEl || !coefsEl) {
+    if (!curveEl || !tMinEl || !tMaxEl || !coefsEl || !sampleEl) {
         console.error('Info panel elements not found!');
         return;
     }
@@ -61,6 +73,7 @@ function updateInfoPanel() {
     curveEl.textContent = curveFamilyValue;
     tMinEl.textContent = tMin.toFixed(2);
     tMaxEl.textContent = tMax.toFixed(2);
+    sampleEl.textContent = samplePointsN;
 
     // Format coefficients with highlighting for selected one
     let coefsText = '[';
@@ -271,6 +284,11 @@ function setup(shaders) {
             case "p":
                 console.log("Toggle Draw Mode");
                 drawPoints = !drawPoints;
+                break;
+            case "h":
+                console.log("Toggle User Interface");
+                let panel = this.document.getElementById("overlay2");
+                togglePanelVisibility(panel);
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
