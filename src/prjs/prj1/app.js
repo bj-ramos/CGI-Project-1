@@ -29,7 +29,13 @@ let zoomValue = 1.0;
 
 // Values for mouse panning
 let mouse_startX, mouse_startY;
+
+// Uniform locations
 let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax, u_panx, u_pany, u_zoom;
+let u_singleColor, u_startingColor, u_endingColor, u_colorModeFlag;
+
+// Flag for color mode
+let singleColor = true;
 
 // Coefficient array - easier to manage (a, b, c)
 let coefficients = [1.0, 0.0, 1.0];
@@ -44,6 +50,8 @@ const COEF_STEP = 0.1;
 const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
 
+
+
 // Toggle interface panel visibility
 function togglePanelVisibility(infoPanel) {
     if (infoPanel.style.display === 'none') {
@@ -53,23 +61,65 @@ function togglePanelVisibility(infoPanel) {
     }
 }
 
-// Change curve color
+// Change single curve color
 function changeCurveColor(r, g, b, a) {
+
+    singleColor = true; // Switch to single color mode
+
+    // Get color from color picker
     let color = document.getElementById("color-picker").value;
     r = parseInt(color.slice(1, 3), 16) / 255;
     g = parseInt(color.slice(3, 5), 16) / 255;
     b = parseInt(color.slice(5, 7), 16) / 255;
     a = 1.0; // Opaque
-    const u_color = gl.getUniformLocation(program, "color");
+
+    // Set uniform value in shader
+    u_singleColor = gl.getUniformLocation(program, "u_singleColor");
     gl.useProgram(program);
-    gl.uniform4f(u_color, r, g, b, a);
+    gl.uniform4f(u_singleColor, r, g, b, a);
 }
 
- // Handle color change button update
-    const colorButton = document.getElementById("apply-color-button");
-    colorButton.addEventListener("click", () => {
-        changeCurveColor();
-    });
+ // Handle single color change button update
+const colorButton = document.getElementById("apply-color-button");
+colorButton.addEventListener("click", () => {
+    changeCurveColor();
+});
+
+// Change gradient curve color
+function changeGradientCurveColor() {
+
+    singleColor = false; // Switch to gradient mode
+
+    // Get colors from color pickers
+    let startingColorValue = document.getElementById("startingColorValue").value;
+    let endingColorValue = document.getElementById("endingColorValue").value;
+
+    // Convert hex colors to normalized RGB
+    let r1 = parseInt(startingColorValue.slice(1, 3), 16) / 255;
+    let g1 = parseInt(startingColorValue.slice(3, 5), 16) / 255;
+    let b1 = parseInt(startingColorValue.slice(5, 7), 16) / 255;
+    let a1 = 1.0; // Opaque
+
+    let r2 = parseInt(endingColorValue.slice(1, 3), 16) / 255;
+    let g2 = parseInt(endingColorValue.slice(3, 5), 16) / 255;
+    let b2 = parseInt(endingColorValue.slice(5, 7), 16) / 255;
+    let a2 = 1.0; // Opaque
+
+    // Set uniform values in shader
+     u_startingColor = gl.getUniformLocation(program, "u_startingColor");
+     u_endingColor = gl.getUniformLocation(program, "u_endingColor");
+
+    // Update shader uniforms
+    gl.useProgram(program);
+    gl.uniform4f(u_startingColor, r1, g1, b1, a1);
+    gl.uniform4f(u_endingColor, r2, g2, b2, a2);
+}
+
+// Handle gradient color change button update
+const gradientButton = document.getElementById("apply-gradient-button");
+gradientButton.addEventListener("click", () => {
+    changeGradientCurveColor();
+});
 
 // Function to update the Info panel
 function updateInfoPanel() {
@@ -431,6 +481,16 @@ function animate(timestamp) {
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    // Check color mode and set uniform
+    u_colorModeFlag = gl.getUniformLocation(program, "u_colorModeFlag");
+    gl.useProgram(program);
+    if(singleColor){
+        gl.uniform1i(u_colorModeFlag, 1); // true
+    }
+    else{
+        gl.uniform1i(u_colorModeFlag, 0); // false
+    }
+    
     gl.useProgram(program);
 
     // Update uniform values
