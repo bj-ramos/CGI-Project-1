@@ -415,8 +415,12 @@ function setup(shaders) {
                 break;
             case "h":
                 console.log("Toggle User Interface");
-                let panel = this.document.getElementById("overlay2");
-                togglePanelVisibility(panel);
+                let panel1 = this.document.getElementById("overlay2");
+                let panel2 = this.document.getElementById("overlay3");
+                let panel3 = this.document.getElementById("overlay4");
+                togglePanelVisibility(panel1);
+                togglePanelVisibility(panel2);
+                togglePanelVisibility(panel3);
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
