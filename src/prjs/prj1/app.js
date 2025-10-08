@@ -50,9 +50,19 @@ const COEF_STEP = 0.1;
 const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
 
-// Flag and direction control for animation
+// Flag, direction control and speed of animation
 let autoAnimate = false;
 let animDirection = 1;
+let animSpeed = 0.5; 
+
+// Handle animation speed slider
+function updateAnimSpeed() {
+    const slider = document.getElementById("animSlider");
+    const sliderValue = document.getElementById("sliderValue");
+    animSpeed = parseFloat(slider.value) * 0.005; 
+    sliderValue.textContent = slider.value;
+    console.log("Animation speed set to:", animSpeed);
+}
 
 // Toggle automatic animation of coefficients
 function toggleAutoAnimation() {
@@ -69,13 +79,15 @@ function toggleAutoAnimation() {
 function animateCoefficients() {
 
     if (!autoAnimate) return;
+
+    updateAnimSpeed();
     
     // Modify the selected coefficient according to the animation direction
     if (animDirection == 1){
-        coefficients[selectedCoefIndex] += 0.005;
+        coefficients[selectedCoefIndex] += animSpeed;
     }
     else if (animDirection == -1){
-        coefficients[selectedCoefIndex] -= 0.005;
+        coefficients[selectedCoefIndex] -= animSpeed;
     }
 
     // Update info panel to reflect changes
@@ -415,8 +427,14 @@ function setup(shaders) {
                 break;
             case "h":
                 console.log("Toggle User Interface");
-                let panel = this.document.getElementById("overlay2");
-                togglePanelVisibility(panel);
+                let panel1 = this.document.getElementById("overlay2");
+                let panel2 = this.document.getElementById("overlay3");
+                let panel3 = this.document.getElementById("overlay4");
+                let panel4 = this.document.getElementById("overlay5");
+                togglePanelVisibility(panel1);
+                togglePanelVisibility(panel2);
+                togglePanelVisibility(panel3);
+                togglePanelVisibility(panel4);
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
