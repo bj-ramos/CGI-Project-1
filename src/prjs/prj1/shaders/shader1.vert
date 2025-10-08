@@ -1,5 +1,7 @@
 #version 300 es
+
 in uint a_position;
+
 uniform int u_curveFamily;
 uniform float u_aspect;
 uniform float u_samplePoints;
@@ -11,6 +13,7 @@ uniform float u_b;
 uniform float u_c;
 uniform float u_tMin;
 uniform float u_tMax;
+
 out float v_t;
 
 void main() {

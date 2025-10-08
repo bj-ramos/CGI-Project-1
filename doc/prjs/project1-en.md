@@ -1,5 +1,5 @@
 # Project 1 - 2D Parametric Curves
-Draft version 0.92
+Final Version 1.0 (Oct 7, 2025)
 
 [![IMAGE ALT TEXT'](./assets/image-01.png)](https://youtu.be/K_npEJzaMM4)
 
@@ -62,6 +62,10 @@ The lower limit $t_0$ for the $t$ parameter can be fixed at 0, but the user may 
 Curves can be drawn in two different ways. Either by drawing line segments connecting the curve points or by simply drawing those points with a size of 5.0 pixels. The **'P'** key will toggle between these two display modes.
 
 Please note that the user can resize the application window at its own will and the display area (canvas) should occupy the full area of the browser's window.
+
+## Evaluation
+
+A project that fulfills all the requirements can easily achieve 18 out of 20 points. You are free to add your own features. Surprise us!
 
 ## Tecnhical Details
 
@@ -133,4 +137,12 @@ $$ \left\{
     \end{array}
     \right.$$
 
-
+### Default parameters for families (reset operation)
+|Family|a|b|c|$t_0$|$t_1$|
+|------|-|-|-|-|-|
+| 1    |1|1|0|0|$2\pi$|
+| 2    |1|17.0|-|0|$2\pi$|
+| 3    |1|8.6|-|0|$10\pi$
+| 4    |7.6|5.1|-|0|10|
+| 5    |1|4|-|0|10|
+| 6    |4|1|-|0|$2\pi$|
