@@ -50,7 +50,39 @@ const COEF_STEP = 0.1;
 const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
 
+// Flag and direction control for animation
+let autoAnimate = false;
+let animDirection = 1;
 
+// Toggle automatic animation of coefficients
+function toggleAutoAnimation() {
+    autoAnimate = !autoAnimate;
+    if (autoAnimate) {
+        console.log("Auto animation started");
+        animateCoefficients();
+    } else {
+        console.log("Auto animation stopped");
+    }
+}
+
+// Function to animate coefficients over time
+function animateCoefficients() {
+
+    if (!autoAnimate) return;
+    
+    // Modify the selected coefficient according to the animation direction
+    if (animDirection == 1){
+        coefficients[selectedCoefIndex] += 0.005;
+    }
+    else if (animDirection == -1){
+        coefficients[selectedCoefIndex] -= 0.005;
+    }
+
+    // Update info panel to reflect changes
+    updateInfoPanel();
+    // Request next frame
+    requestAnimationFrame(animateCoefficients);
+}
 
 // Toggle interface panel visibility
 function togglePanelVisibility(infoPanel) {
@@ -388,6 +420,7 @@ function setup(shaders) {
                 break;
             case " ":
                 console.log("Toggle Auto Animation");
+                toggleAutoAnimation();
                 break;
             case "ArrowLeft":
                 console.log("ArrowLeft - Select previous coefficient");
@@ -399,11 +432,23 @@ function setup(shaders) {
                 break;
             case "ArrowUp":
                 console.log("ArrowUp - Increase selected coefficient");
-                increaseSelectedCoefficient();
+                if(autoAnimate){
+                    autoAnimate = false;
+                    animDirection = 1;
+                }
+                else{
+                    increaseSelectedCoefficient();
+                }
                 break;
             case "ArrowDown":
                 console.log("ArrowDown - Decrease selected coefficient");
-                decreaseSelectedCoefficient();
+                if(autoAnimate){
+                    autoAnimate = false;
+                    animDirection = -1;
+                }
+                else{
+                    decreaseSelectedCoefficient();
+                }
                 break;
             case "PageUp":
                 console.log("PageUp - Increase t max");
