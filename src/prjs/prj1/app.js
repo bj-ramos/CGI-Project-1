@@ -387,8 +387,7 @@ function setup(shaders) {
                 */   
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
-                // Reset depends on which family is selected
-                selectedCoefIndex = 0;
+                // Reset depends on which family is selected;
                 tMin = 0.0;
                 switch(curveFamilyValue){
                     case 0:
