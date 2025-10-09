@@ -1,0 +1,1 @@
+Mouse drag drift (mostly horizontal); (aspect ratio calculation in vert shader)
