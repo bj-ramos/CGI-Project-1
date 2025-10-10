@@ -53,13 +53,63 @@ const T_STEP = 0.1;
 // Flag, direction control and speed of animation
 let autoAnimate = false;
 let animDirection = 1;
-let animSpeed = 0.5; 
+let animSpeed = 0.5;
+
+// Add these variables at the top with your other globals
+let dvdVelocityX = 0.01;
+let dvdVelocityY = 0.007;
+
+// DVD animation function 
+function updateDVDAnimation() {
+    // Only animate when on curve family 0
+    if (curveFamilyValue !== 0) {
+        return;
+    }
+
+    // Update position
+    panxValue += dvdVelocityX;
+    panyValue += dvdVelocityY;
+
+
+    const MARGIN = 0.5;
+
+    // for aspect ratio
+    const aspect = canvas.width / canvas.height;
+
+    // Check boundaries with aspect ratio for X axis
+    if (panxValue + MARGIN >= aspect || panxValue - MARGIN <= -aspect) {
+        dvdVelocityX = -dvdVelocityX;
+        panxValue = Math.max(-aspect + MARGIN, Math.min(aspect - MARGIN, panxValue));
+        changeBounceColor();
+    }
+
+    // Check boundaries for Y axis (stays at 1.0)
+    if (panyValue + MARGIN >= 1.0 || panyValue - MARGIN <= -1.0) {
+        dvdVelocityY = -dvdVelocityY;
+        panyValue = Math.max(-1.0 + MARGIN, Math.min(1.0 - MARGIN, panyValue));
+        changeBounceColor();
+    }
+}
+
+// Change color randomly on bounce (DVD style!)
+function changeBounceColor() {
+    const r = Math.random();
+    const g = Math.random();
+    const b = Math.random();
+
+    singleColor = true;
+    u_singleColor = gl.getUniformLocation(program, "u_singleColor");
+    gl.useProgram(program);
+    gl.uniform4f(u_singleColor, r, g, b, 1.0);
+
+    console.log(`Bounce! New color: ${r.toFixed(2)}, ${g.toFixed(2)}, ${b.toFixed(2)}`);
+}
 
 // Handle animation speed slider
 function updateAnimSpeed() {
     const slider = document.getElementById("animSlider");
     const sliderValue = document.getElementById("sliderValue");
-    animSpeed = parseFloat(slider.value) * 0.005; 
+    animSpeed = parseFloat(slider.value) * 0.005;
     sliderValue.textContent = slider.value;
     console.log("Animation speed set to:", animSpeed);
 }
@@ -81,12 +131,12 @@ function animateCoefficients() {
     if (!autoAnimate) return;
 
     updateAnimSpeed();
-    
+
     // Modify the selected coefficient according to the animation direction
-    if (animDirection == 1){
+    if (animDirection == 1) {
         coefficients[selectedCoefIndex] += animSpeed;
     }
-    else if (animDirection == -1){
+    else if (animDirection == -1) {
         coefficients[selectedCoefIndex] -= animSpeed;
     }
 
@@ -123,7 +173,7 @@ function changeCurveColor(r, g, b, a) {
     gl.uniform4f(u_singleColor, r, g, b, a);
 }
 
- // Handle single color change button update
+// Handle single color change button update
 const colorButton = document.getElementById("apply-color-button");
 colorButton.addEventListener("click", () => {
     changeCurveColor();
@@ -150,8 +200,8 @@ function changeGradientCurveColor() {
     let a2 = 1.0; // Opaque
 
     // Set uniform values in shader
-     u_startingColor = gl.getUniformLocation(program, "u_startingColor");
-     u_endingColor = gl.getUniformLocation(program, "u_endingColor");
+    u_startingColor = gl.getUniformLocation(program, "u_startingColor");
+    u_endingColor = gl.getUniformLocation(program, "u_endingColor");
 
     // Update shader uniforms
     gl.useProgram(program);
@@ -237,20 +287,20 @@ function decreaseT() {
 
 
 // Call same functions as in SETUP but on keystroke update in order to refresh the aBuffer contents
-function updateSamplePoints(step){
+function updateSamplePoints(step) {
 
-    if (step == 0){
+    if (step == 0) {
         // Reset Sample points to default
         samplePointsN = 60000;
     }
-    else{
+    else {
         // Clamp the value between 0 and 60000
         samplePointsN = Math.max(0, Math.min(60000, samplePointsN + step));
     }
 
     // Update Buffer with new sample size
     let a_position_array = new Uint32Array(samplePointsN);
-    for (let i = 0; i < samplePointsN; i++){
+    for (let i = 0; i < samplePointsN; i++) {
         a_position_array[i] = i;
     }
     console.log("Updated sample points:", samplePointsN);
@@ -271,7 +321,7 @@ function updateSamplePoints(step){
     gl.vertexAttribIPointer(a_position, 1, gl.UNSIGNED_INT, false, 0, 0);
     gl.enableVertexAttribArray(a_position);
     gl.bindVertexArray(null);
-   
+
 }
 
 function resize(target) {
@@ -304,7 +354,7 @@ function setup(shaders) {
 
     // Populate an array with unsigned int values ranging from 0 to number of sample points
     let a_position_array = new Uint32Array(samplePointsN);
-    for (let i = 0; i < samplePointsN; i++){
+    for (let i = 0; i < samplePointsN; i++) {
         a_position_array[i] = i;
     }
 
@@ -384,12 +434,12 @@ function setup(shaders) {
                 zoomValue = 1.0;
                 panxValue = 0.0;
                 panyValue = 0.0;
-                */   
+                */
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
                 // Reset depends on which family is selected;
                 tMin = 0.0;
-                switch(curveFamilyValue){
+                switch (curveFamilyValue) {
                     case 0:
                         coefficients = [1.0, 1.0, 0.0];
                         tMax = 6.283185; // 2*PI
@@ -449,21 +499,21 @@ function setup(shaders) {
                 break;
             case "ArrowUp":
                 console.log("ArrowUp - Increase selected coefficient");
-                if(autoAnimate){
+                if (autoAnimate) {
                     autoAnimate = false;
                     animDirection = 1;
                 }
-                else{
+                else {
                     increaseSelectedCoefficient();
                 }
                 break;
             case "ArrowDown":
                 console.log("ArrowDown - Decrease selected coefficient");
-                if(autoAnimate){
+                if (autoAnimate) {
                     autoAnimate = false;
                     animDirection = -1;
                 }
-                else{
+                else {
                     decreaseSelectedCoefficient();
                 }
                 break;
@@ -499,7 +549,7 @@ function setup(shaders) {
     // Handle mouse move only if clicked
     canvas.addEventListener("mousemove", function (event) {
         console.log("Mouse move", event);
-        if (isClicked){
+        if (isClicked) {
             let deltaX = event.clientX - mouse_startX;
             let deltaY = event.clientY - mouse_startY;
             // Update pan values based on mouse movement and current zoom level
@@ -533,6 +583,11 @@ function setup(shaders) {
         }
     });
 
+    // Initialize DVD animation velocities with random values
+    dvdVelocityX = (Math.random() - 0.5) * 0.01;
+    dvdVelocityY = (Math.random() - 0.5) * 0.01;
+    console.log("DVD animation ready - will activate on curve family 0");
+
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     window.requestAnimationFrame(animate);
@@ -543,16 +598,19 @@ function animate(timestamp) {
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    // Update DVD animation if on curve family 0
+    updateDVDAnimation();
+
     // Check color mode and set uniform
     u_colorModeFlag = gl.getUniformLocation(program, "u_colorModeFlag");
     gl.useProgram(program);
-    if(singleColor){
+    if (singleColor) {
         gl.uniform1i(u_colorModeFlag, 1); // true
     }
-    else{
+    else {
         gl.uniform1i(u_colorModeFlag, 0); // false
     }
-    
+
     gl.useProgram(program);
 
     // Update uniform values
@@ -571,10 +629,10 @@ function animate(timestamp) {
     gl.bindVertexArray(vao);
 
     // Drawing code
-    if(drawPoints){
+    if (drawPoints) {
         gl.drawArrays(gl.POINTS, 0, samplePointsN);
     }
-    else{
+    else {
         gl.drawArrays(gl.LINE_STRIP, 0, samplePointsN);
     }
 
