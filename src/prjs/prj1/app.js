@@ -437,8 +437,7 @@ function setup(shaders) {
                 */
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
-                // Reset depends on which family is selected
-                selectedCoefIndex = 0;
+                // Reset depends on which family is selected;
                 tMin = 0.0;
                 switch (curveFamilyValue) {
                     case 0:
@@ -557,8 +556,8 @@ function setup(shaders) {
             // Invert y axis movement for intuitive panning
             // Scale movement by canvas dimensions to maintain consistent panning speed
             // Convert pixel movement to normalized device coordinates in clip space
-            panxValue += (2 * deltaX / canvas.width) * (1 / zoomValue);
-            panyValue -= (2 * deltaY / canvas.height) * (1 / zoomValue);
+            panxValue += (2 * deltaX / canvas.width) * (1/zoomValue) * (canvas.width / canvas.height);  // Aspect ratio correction
+            panyValue -= (2 * deltaY / canvas.height) * (1/zoomValue);
             mouse_startX = event.clientX;
             mouse_startY = event.clientY;
             console.log("Panning to: ", panxValue, panyValue);

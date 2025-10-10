@@ -1,0 +1,4 @@
+Clean up vertex shader uniforms (try to use different types)
+Clean up debug output code
+Reduce and simplify code when needed
+Add good comment structure
