@@ -1,31 +1,35 @@
 #version 300 es
 
-in uint a_position;
+// === Attribute inputs ===
+in uint a_position; // Index of the vertex (0 to 60000)
 
-uniform int u_curveFamily;
-uniform float u_aspect;
-uniform float u_samplePoints;
-uniform float u_zoom;
-uniform vec2 u_pan;
-uniform vec2 u_tLimits;
-uniform vec3 u_coefficients;
+// === Uniform inputs ===
+uniform int u_curveFamily; // Curve family selector
+uniform float u_aspect; // Aspect ratio of the canvas
+uniform float u_samplePoints; // Number of sample points 
+uniform float u_zoom; // Zoom factor
+uniform vec2 u_pan; // Pan factor
+uniform vec2 u_tLimits; // Min and max t values
+uniform vec3 u_coefficients; // Coefficients for the curves
 
-out float v_t;
+// === Output to the fragment shader ===
+out float v_t; // Normalized t value [0,1] for color mapping
 
 void main() {
-    /**
-    * Map index [0,60000] → angle [u_tMin, u_tMax]
-    * (since all curves are built with sin and cos, this normalization works for every situation)
-    */
+    
+    // Map index [0,60000] → angle [u_tMin, u_tMax]
+    // (since all curves are built with sin and cos, this normalization works for every situation)
+    
     float t = mix(u_tLimits.x, u_tLimits.y, float(a_position) / u_samplePoints);
 
+    // Normalized t value for color mapping
     v_t = float(a_position) / u_samplePoints; 
 
-    //Declare x and y
+    // Variables to hold the x and y coordinates of the curve
     float x = 0.0;
     float y = 0.0;
 
-    //Select curve family
+    // Calculate the x and y coordinates based on the selected curve family
     switch(u_curveFamily) {
         case 0:
             x = cos(t) * 0.5;
@@ -57,9 +61,9 @@ void main() {
             break;
     }
 
-    //Dividing x by the aspect ratio gives us an always square proportion
+    // Set the vertex position, applying aspect ratio, zoom, and pan
     gl_Position = vec4(((x + u_pan.x) / u_aspect) * u_zoom, (y + u_pan.y) * u_zoom, 0.0, 1.0);
 
-    //Defines the pixel size of each point
+    // Set point size for rendering points
     gl_PointSize = 5.0;
 }
