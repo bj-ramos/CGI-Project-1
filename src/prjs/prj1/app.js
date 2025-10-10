@@ -430,11 +430,10 @@ function setup(shaders) {
             case "r":
                 // Reset everything to default values
                 console.log("Restart Curve Family");
-                /** Not sure if we want to reset view parameters too
+                // Not sure if we want to reset view parameters too
                 zoomValue = 1.0;
                 panxValue = 0.0;
-                panyValue = 0.0;
-                */
+                panyValue = 0.0;    
                 updateSamplePoints(0);
                 console.log("Restart Coefficients");
                 // Reset depends on which family is selected;
@@ -584,8 +583,8 @@ function setup(shaders) {
     });
 
     // Initialize DVD animation velocities with random values
-    dvdVelocityX = (Math.random() - 0.5) * 0.01;
-    dvdVelocityY = (Math.random() - 0.5) * 0.01;
+    dvdVelocityX = (Math.random() - 0.5) * 0.015;
+    dvdVelocityY = (Math.random() - 0.5) * 0.015;
     console.log("DVD animation ready - will activate on curve family 0");
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
