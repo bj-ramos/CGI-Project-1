@@ -40,7 +40,7 @@ void main() {
             y = 2.0 * (sin(u_coefficients.x * t) + ((sin(u_coefficients.y * t)) * (sin(u_coefficients.y * t)) * (sin(u_coefficients.y * t))));
             break;
         case 3:
-            x = cos(u_coefficients.x * t) * sin(sin(u_coefficients.y * t));
+            x = cos(u_coefficients.x * t) * sin(sin(u_coefficients.x * t));
             y = sin(u_coefficients.x * t) * cos(cos(u_coefficients.y * t));
             break;
         case 4:
