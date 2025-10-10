@@ -20,79 +20,42 @@ body {
     margin: 0 auto;
 }
 
-#overlay {
+#overlay, #overlay2, #overlay3, #overlay4, #overlay5 {
     border-radius: 10px;
     position: fixed;
     margin: 0;
     padding: 12px 15px;
-    top: 10px;
-    left: 10px;
     background-color: rgba(128, 128, 128, 0.85);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     color: white;
     font-family: Arial, sans-serif;
     font-size: 14px;
     min-width: 180px;
+}
+
+#overlay {
+    top: 10px;
+    left: 10px;
 }
 
 #overlay2 {
-    border-radius: 10px;
-    position: fixed;
-    margin: 0;
-    padding: 12px 15px;
     bottom: 10px;
     left: 10px;
-    background-color: rgba(128, 128, 128, 0.85);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    min-width: 180px;
 }
 
 #overlay3 {
-    border-radius: 10px;
-    position: fixed;
-    margin: 0;
-    padding: 12px 15px;
     top: 10px;
     right: 30px;
-    background-color: rgba(128, 128, 128, 0.85);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    min-width: 180px;
 }
 
 #overlay4 {
-    border-radius: 10px;
-    position: fixed;
-    margin: 0;
-    padding: 12px 15px;
     bottom: 10px;
     right: 80px;
-    background-color: rgba(128, 128, 128, 0.85);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    min-width: 180px;
 }
 
 #overlay5 {
-    border-radius: 10px;
-    position: fixed;
-    margin: 0;
-    padding: 12px 15px;
     bottom: 10px;
     left: 250px;
-    background-color: rgba(128, 128, 128, 0.85);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    min-width: 180px;
 }
 
 .panel-title {
