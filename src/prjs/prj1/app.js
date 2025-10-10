@@ -1,63 +1,77 @@
 import { loadShadersFromURLS, buildProgramFromSources, setupWebGL } from "../../libs/utils.js";
 
+
+//------------------------------------------------------------------------------
+// CGI - Project 1
+// Bruno Ramos 52886
+// Lipy Cardoso 63542
+// Script for rendering various parametric curves with WebGL2
+//--------------------------------------------------------------------------------
+
+
+//=== Global Variables ==========================================================
+
+// WebGL context, program, buffers
 let canvas;
 let gl;
 let program;
-
-// Create vao
 let vao;
-
-// Variable buffer to be accessed in any call 
 let aBuffer;
 
-// Modifier to control incremental or decremental steps in the number of sample points inside a_pos_array
+// Number of sample points for curve rendering
 let samplePointsN = 60000;
 
-// Flag for drawing points or lines
-let drawPoints = false;
-
-// Flag for mouse click and drag
-let isClicked = false;
-
-// Values for uniforms 
+// Current curve family selection
 let curveFamilyValue = 0;
 
-// Values for panning and zooming
+// Current user-selected coefficient index (0, 1, or 2)
+let selectedCoefIndex = 0; 
+
+// Animation direction control: 1 for increasing, -1 for decreasing
+let animDirection = 1;
+
+// View parameters for panning and zooming - default values
 let panxValue = 0.0;
 let panyValue = 0.0;
 let zoomValue = 1.0;
 
-// Values for mouse panning
-let mouse_startX, mouse_startY;
-
-// Uniform locations
-let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax, u_panx, u_pany, u_zoom;
-let u_singleColor, u_startingColor, u_endingColor, u_colorModeFlag;
-
-// Flag for color mode
-let singleColor = true;
-
-// Coefficient array - easier to manage (a, b, c)
-let coefficients = [1.0, 0.0, 1.0];
-let selectedCoefIndex = 0; // Which coefficient is currently selected
-
-// Parameter range for t
+// t parameter limits for curve rendering
 let tMin = 0.0;
 let tMax = 6.283185; // 2*PI
 
-// Step sizes for adjustments
+// Step sizes for coefficient and t user adjustments
 const COEF_STEP = 0.1;
-const COEF_BIG_STEP = 1.0;
 const T_STEP = 0.1;
 
-// Flag, direction control and speed of animation
-let autoAnimate = false;
-let animDirection = 1;
+// Animation speed factor
 let animSpeed = 0.5;
 
-// Add these variables at the top with your other globals
+// DVD-logo-style animation velocities for curve family 0
 let dvdVelocityX = 0.01;
 let dvdVelocityY = 0.007;
+
+// Flag to toggle between line and point rendering - default to line
+let drawPoints = false;
+
+// Mouse interaction flag 
+let isClicked = false;
+
+// Color mode flag - true for single color, false for gradient
+let singleColor = true;
+
+// Coefficient Auto-Animation toggle flag
+let autoAnimate = false;
+
+// Mouse starting positions for panning 
+let mouse_startX, mouse_startY;
+
+// Uniform locations in shaders 
+let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax, u_panx, u_pany, u_zoom;
+let u_singleColor, u_startingColor, u_endingColor, u_colorModeFlag;
+
+// Initial coefficients for curve families 
+let coefficients = [1.0, 0.0, 1.0];
+
 
 // DVD animation function 
 function updateDVDAnimation() {
