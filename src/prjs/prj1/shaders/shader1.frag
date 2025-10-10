@@ -2,15 +2,17 @@
 
 precision mediump float;
 
-uniform vec4 u_singleColor;
-uniform vec4 u_startingColor;
-uniform vec4 u_endingColor;
+// === Uniform inputs ===
+uniform vec4 u_singleColor; // Single color mode value
+uniform vec4 u_startingColor; // Gradient start color value
+uniform vec4 u_endingColor; // Gradient end color value
+uniform bool u_colorModeFlag; // Flag between single color mode or gradient mode
 
-uniform bool u_colorModeFlag;
+// === Varying inputs ===
+in float v_t; // Interpolation factor for gradient mode
 
-in float v_t;
-
-out vec4 frag_color;
+// === Output ===
+out vec4 frag_color; // Final fragment color output
 
 void main() {
 
