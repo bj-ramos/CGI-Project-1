@@ -66,7 +66,7 @@ let autoAnimate = false;
 let mouse_startX, mouse_startY;
 
 // Uniform locations in shaders 
-let u_curveFamily, u_samplePoints, u_a, u_b, u_c, u_tMin, u_tMax, u_panx, u_pany, u_zoom;
+let u_curveFamily, u_samplePoints, u_coefficients, u_tLimits, u_pan, u_zoom;
 let u_singleColor, u_startingColor, u_endingColor, u_colorModeFlag;
 
 // Initial coefficients for curve families 
@@ -355,14 +355,10 @@ function setup(shaders) {
     // Setup location for uniforms in shaders
     u_curveFamily = gl.getUniformLocation(program, "u_curveFamily");
     u_samplePoints = gl.getUniformLocation(program, "u_samplePoints");
-    u_panx = gl.getUniformLocation(program, "u_panx");
-    u_pany = gl.getUniformLocation(program, "u_pany");
     u_zoom = gl.getUniformLocation(program, "u_zoom");
-    u_a = gl.getUniformLocation(program, "u_a");
-    u_b = gl.getUniformLocation(program, "u_b");
-    u_c = gl.getUniformLocation(program, "u_c");
-    u_tMin = gl.getUniformLocation(program, "u_tMin");
-    u_tMax = gl.getUniformLocation(program, "u_tMax");
+    u_pan = gl.getUniformLocation(program, "u_pan");
+    u_tLimits = gl.getUniformLocation(program, "u_tLimits");
+    u_coefficients = gl.getUniformLocation(program, "u_coefficients");
 
     // Initial update of info panel
     updateInfoPanel();
@@ -576,14 +572,10 @@ function animate(timestamp) {
     // Update uniform values
     gl.uniform1i(u_curveFamily, curveFamilyValue);
     gl.uniform1f(u_samplePoints, samplePointsN);
-    gl.uniform1f(u_panx, panxValue);
-    gl.uniform1f(u_pany, panyValue);
     gl.uniform1f(u_zoom, zoomValue);
-    gl.uniform1f(u_a, coefficients[0]);
-    gl.uniform1f(u_b, coefficients[1]);
-    gl.uniform1f(u_c, coefficients[2]);
-    gl.uniform1f(u_tMin, tMin);
-    gl.uniform1f(u_tMax, tMax);
+    gl.uniform2f(u_pan, panxValue, panyValue);
+    gl.uniform2f(u_tLimits, tMin, tMax);
+    gl.uniform3f(u_coefficients, coefficients[0], coefficients[1], coefficients[2]);
 
     // Bind vao
     gl.bindVertexArray(vao);
